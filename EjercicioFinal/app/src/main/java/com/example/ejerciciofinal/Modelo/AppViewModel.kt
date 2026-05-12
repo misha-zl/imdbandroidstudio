@@ -28,6 +28,15 @@ class AppViewModel(
         peliculaSeleccionada = null
     }
 
+
+    fun puedeAñadirPelicula(): Boolean {
+        return usuario != null
+    }
+
+    fun puedeEditarEliminarPelicula(): Boolean {
+        return usuario?.rol == "ADMIN"
+    }
+
     fun esAdmin(): Boolean {
         return usuario?.rol == "ADMIN"
     }

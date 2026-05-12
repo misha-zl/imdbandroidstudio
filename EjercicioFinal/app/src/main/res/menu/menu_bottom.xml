@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/inicioFragment"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="Inicio" />
+
+    <item
+        android:id="@+id/anadirPeliculaFragment"
+        android:icon="@android:drawable/ic_input_add"
+        android:title="Añadir" />
+
+</menu>

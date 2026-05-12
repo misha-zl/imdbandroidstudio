@@ -8,6 +8,9 @@
     android:background="#F7F7F7"
     tools:context=".InicioFragment">
 
+
+
+
     <LinearLayout
         android:id="@+id/barraSuperiorInicio"
         android:layout_width="0dp"
@@ -90,75 +93,20 @@
         app:layout_constraintTop_toBottomOf="@id/etBuscarInicio"
         app:layout_constraintWidth_percent="0.88" />
 
+
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPeliculas"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="8dp"
-        android:clipToPadding="false"
-        android:paddingBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/barraInferiorInicio"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvSeccionPeliculas"
-        app:layout_constraintWidth_percent="0.92"
-        tools:listitem="@layout/item_pelicula" />
+        app:layout_constraintWidth_percent="0.92" />
 
-    <LinearLayout
-        android:id="@+id/barraInferiorInicio"
-        android:layout_width="0dp"
-        android:layout_height="64dp"
-        android:background="#000000"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <TextView
-            android:id="@+id/navInicio"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Inicio"
-            android:textColor="#F5C518"
-            android:textSize="12sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/navBuscar"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Buscar"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/navAdd"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Añadir"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/navPerfil"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Perfil"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp" />
-
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

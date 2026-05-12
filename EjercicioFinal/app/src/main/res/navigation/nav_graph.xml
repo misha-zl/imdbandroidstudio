@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
 
+    <!-- LOGIN -->
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.ejerciciofinal.LoginFragment"
@@ -22,6 +22,7 @@
 
     </fragment>
 
+    <!-- REGISTRO -->
     <fragment
         android:id="@+id/registroFragment"
         android:name="com.example.ejerciciofinal.RegistroFragment"
@@ -34,10 +35,68 @@
 
     </fragment>
 
+    <!-- INICIO / LISTA DE PELÍCULAS -->
     <fragment
         android:id="@+id/inicioFragment"
         android:name="com.example.ejerciciofinal.InicioFragment"
         android:label="Inicio"
-        tools:layout="@layout/fragment_inicio" />
+        tools:layout="@layout/fragment_inicio">
+
+        <action
+            android:id="@+id/action_inicioFragment_to_anadirPeliculaFragment"
+            app:destination="@id/anadirPeliculaFragment" />
+
+        <action
+            android:id="@+id/action_inicioFragment_to_detallePeliculaFragment"
+            app:destination="@id/detallePeliculaFragment" />
+
+    </fragment>
+
+    <!-- AÑADIR PELÍCULA -->
+    <fragment
+        android:id="@+id/anadirPeliculaFragment"
+        android:name="com.example.ejerciciofinal.AddPeliculaFragment"
+        android:label="Añadir película"
+        tools:layout="@layout/fragment_add_pelicula">
+
+        <action
+            android:id="@+id/action_anadirPeliculaFragment_to_inicioFragment"
+            app:destination="@id/inicioFragment" />
+
+    </fragment>
+
+    <!-- DETALLE DE PELÍCULA -->
+    <fragment
+        android:id="@+id/detallePeliculaFragment"
+        android:name="com.example.ejerciciofinal.DetallePeliculaFragment"
+        android:label="Detalle película"
+        tools:layout="@layout/fragment_detalle_pelicula">
+
+        <action
+            android:id="@+id/action_detallePeliculaFragment_to_editarPeliculaFragment"
+            app:destination="@id/editarPeliculaFragment" />
+
+        <action
+            android:id="@+id/action_detallePeliculaFragment_to_inicioFragment"
+            app:destination="@id/inicioFragment" />
+
+    </fragment>
+
+    <!-- EDITAR PELÍCULA -->
+    <fragment
+        android:id="@+id/editarPeliculaFragment"
+        android:name="com.example.ejerciciofinal.EditarPeliculaFragment"
+        android:label="Editar película"
+        tools:layout="@layout/fragment_editar_pelicula">
+
+        <action
+            android:id="@+id/action_editarPeliculaFragment_to_inicioFragment"
+            app:destination="@id/inicioFragment" />
+
+        <action
+            android:id="@+id/action_editarPeliculaFragment_to_detallePeliculaFragment"
+            app:destination="@id/detallePeliculaFragment" />
+
+    </fragment>
 
 </navigation>
