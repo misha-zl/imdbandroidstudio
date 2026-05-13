@@ -1,10 +1,15 @@
 package com.example.ejerciciofinal.modelo
 
 import androidx.annotation.WorkerThread
+import kotlinx.coroutines.flow.Flow
 
 class RepositorioUsuario(
     private val usuarioDAO: UsuarioDAO
 ) {
+
+    fun mostrarUsuarios(): Flow<List<Usuario>> {
+        return usuarioDAO.mostrarUsuarios()
+    }
 
     @WorkerThread
     suspend fun login(nombreUsuario: String, password: String): Usuario? {
@@ -34,6 +39,11 @@ class RepositorioUsuario(
     @WorkerThread
     suspend fun actualizarUsuario(usuario: Usuario) {
         usuarioDAO.actualizarUsuario(usuario)
+    }
+
+    @WorkerThread
+    suspend fun borrarUsuario(usuario: Usuario) {
+        usuarioDAO.borrarUsuario(usuario)
     }
 
     @WorkerThread

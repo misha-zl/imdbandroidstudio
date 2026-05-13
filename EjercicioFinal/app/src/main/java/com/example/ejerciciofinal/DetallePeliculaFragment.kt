@@ -30,6 +30,7 @@ class DetallePeliculaFragment : Fragment() {
         cargarDatosPelicula()
         controlarBotonesAdmin()
         configurarBotones()
+        configurarBotonVolver()
     }
 
     private fun cargarDatosPelicula() {
@@ -105,6 +106,12 @@ class DetallePeliculaFragment : Fragment() {
             }
             .setNegativeButton("Cancelar", null)
             .show()
+    }
+
+    private fun configurarBotonVolver() {
+        binding.btnVolverPeliculas.setOnClickListener {
+            findNavController().navigate(R.id.action_detallePeliculaFragment_to_inicioFragment)
+        }
     }
 
     override fun onDestroyView() {

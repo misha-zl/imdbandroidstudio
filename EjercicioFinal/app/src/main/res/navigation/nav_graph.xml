@@ -99,4 +99,43 @@
 
     </fragment>
 
+    <fragment
+        android:id="@+id/perfilFragment"
+        android:name="com.example.ejerciciofinal.PerfilFragment"
+        android:label="Perfil"
+        tools:layout="@layout/fragment_perfil">
+
+        <action
+            android:id="@+id/action_perfilFragment_to_anadirUsuarioFragment"
+            app:destination="@id/anadirUsuarioFragment" />
+
+        <action
+            android:id="@+id/action_perfilFragment_to_editarUsuarioFragment"
+            app:destination="@id/editarUsuarioFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/anadirUsuarioFragment"
+        android:name="com.example.ejerciciofinal.AnadirUsuarioFragment"
+        android:label="Añadir usuario"
+        tools:layout="@layout/fragment_anadir_usuario">
+
+        <action
+            android:id="@+id/action_anadirUsuarioFragment_to_perfilFragment"
+            app:destination="@id/perfilFragment" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/editarUsuarioFragment"
+        android:name="com.example.ejerciciofinal.EditarUsuarioFragment"
+        android:label="Editar usuario"
+        tools:layout="@layout/fragment_editar_usuario">
+
+        <action
+            android:id="@+id/action_editarUsuarioFragment_to_perfilFragment"
+            app:destination="@id/perfilFragment" />
+
+    </fragment>
+
 </navigation>

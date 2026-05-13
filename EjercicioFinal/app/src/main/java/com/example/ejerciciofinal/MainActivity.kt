@@ -8,7 +8,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -21,8 +21,6 @@ import com.example.ejerciciofinal.modelo.RepositorioPelicula
 import com.example.ejerciciofinal.modelo.RepositorioUsuario
 import com.example.ejerciciofinal.modelo.Usuario
 import com.google.android.material.bottomnavigation.BottomNavigationView
-
-import androidx.navigation.fragment.NavHostFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -59,38 +57,51 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Cargamos el layout principal de la Activity.
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Configuramos la toolbar superior.
         setSupportActionBar(binding.toolbar)
 
-        // Cogemos el NavHostFragment de forma segura.
-        // El NavHostFragment es el contenedor donde se cargan los fragments.
+        // Buscamos el NavHostFragment de forma segura.
+        // Este fragment es el contenedor donde se van mostrando las pantallas.
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
 
-        // De ese NavHostFragment sacamos el NavController.
-        // El NavController es el que mueve la app entre pantallas.
+        // Sacamos el NavController desde el NavHostFragment.
+        // El NavController sirve para navegar entre fragments.
         val navController = navHostFragment.navController
 
+        // Aquí indicamos cuáles son las pantallas principales.
+        // En estas pantallas no aparece la flecha de volver arriba.
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.inicioFragment,
-                R.id.anadirPeliculaFragment
+                R.id.anadirPeliculaFragment,
+                R.id.perfilFragment
             )
         )
 
+        // Unimos la toolbar con el sistema de navegación.
         setupActionBarWithNavController(navController, appBarConfiguration)
 
+        // Buscamos el menú inferior.
         val bottomNavigationView =
             findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
+        // Conectamos el menú inferior con el nav_graph.
+        // IMPORTANTE: los ids de menu_bottom.xml deben coincidir con los ids del nav_graph.xml.
         bottomNavigationView.setupWithNavController(navController)
 
+        // Inserta usuarios y películas iniciales si la base de datos está vacía.
+        // Por ejemplo: admin, usuario normal y películas iniciales.
         miViewModel.insertarDatosIniciales()
 
+        // Carga la sesión guardada si el usuario ya había iniciado sesión antes.
         cargarSesionDesdeSharedPreferences()
 
+        // Cada vez que cambiamos de pantalla, decidimos si se ve o no el menú inferior.
         navController.addOnDestinationChangedListener { _, destination, _ ->
 
             bottomNavigationView.visibility =
@@ -103,6 +114,7 @@ class MainActivity : AppCompatActivity() {
                     View.VISIBLE
                 }
 
+            // Actualiza el menú superior.
             invalidateOptionsMenu()
         }
     }
@@ -149,34 +161,6 @@ class MainActivity : AppCompatActivity() {
         editor.apply()
     }
 
-
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-
-        menu.findItem(R.id.action_desloguearse)?.isVisible =
-            miViewModel.usuario != null
-
-        return super.onPrepareOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        return when (item.itemId) {
-
-            R.id.action_desloguearse -> {
-                desloguearse()
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
     fun desloguearse() {
         borrarSesionDeSharedPreferences()
 
@@ -196,8 +180,38 @@ class MainActivity : AppCompatActivity() {
         navController.navigate(R.id.loginFragment)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+
+        // La opción de desloguearse solo aparece si hay usuario iniciado.
+        menu.findItem(R.id.action_desloguearse)?.isVisible =
+            miViewModel.usuario != null
+
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        return when (item.itemId) {
+
+            R.id.action_desloguearse -> {
+                desloguearse()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
+
+        val navController = navHostFragment.navController
 
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()

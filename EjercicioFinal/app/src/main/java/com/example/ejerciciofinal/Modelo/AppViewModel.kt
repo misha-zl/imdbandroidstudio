@@ -7,12 +7,19 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
+
+
 class AppViewModel(
     private val repositorioPelicula: RepositorioPelicula,
     private val repositorioUsuario: RepositorioUsuario
 ) : ViewModel() {
 
     var usuario: Usuario? = null
+
+    var usuarioSeleccionado: Usuario? = null
+
+    val listaUsuarios: LiveData<List<Usuario>> =
+        repositorioUsuario.mostrarUsuarios().asLiveData()
 
     var peliculaSeleccionada: Pelicula? = null
 
@@ -183,6 +190,85 @@ class AppViewModel(
             repositorioPelicula.insertarPeliculas(peliculasIniciales)
         }
     }
+
+    fun seleccionarUsuario(usuario: Usuario) {
+        usuarioSeleccionado = usuario
+    }
+
+    fun puedeGestionarUsuarios(): Boolean {
+        return usuario?.rol == "ADMIN"
+    }
+
+    fun crearUsuarioPorAdmin(
+        nombre: String,
+        nombreUsuario: String,
+        password: String,
+        telefono: String,
+        esAdmin: Boolean,
+        onResultado: (Boolean, String) -> Unit
+    ) = viewModelScope.launch {
+
+        val usuarioExistente =
+            repositorioUsuario.buscarUsuarioPorNombreUsuario(nombreUsuario)
+
+        if (usuarioExistente != null) {
+            onResultado(false, "Ya existe un usuario con ese nombre de usuario")
+            return@launch
+        }
+
+        val rol = if (esAdmin) "ADMIN" else "NORMAL"
+
+        val nuevoUsuario = Usuario(
+            nombre = nombre,
+            nombreUsuario = nombreUsuario,
+            password = password,
+            telefono = telefono,
+            rol = rol
+        )
+
+        repositorioUsuario.insertarUsuario(nuevoUsuario)
+
+        onResultado(true, "Usuario creado correctamente")
+    }
+
+    fun actualizarUsuarioPorAdmin(
+        usuarioActualizado: Usuario,
+        onResultado: (Boolean, String) -> Unit
+    ) = viewModelScope.launch {
+
+        val usuarioExistente =
+            repositorioUsuario.buscarUsuarioPorNombreUsuario(usuarioActualizado.nombreUsuario)
+
+        if (usuarioExistente != null && usuarioExistente.id != usuarioActualizado.id) {
+            onResultado(false, "Ya existe otro usuario con ese nombre de usuario")
+            return@launch
+        }
+
+        repositorioUsuario.actualizarUsuario(usuarioActualizado)
+
+        if (usuario?.id == usuarioActualizado.id) {
+            usuario = usuarioActualizado
+        }
+
+        onResultado(true, "Usuario actualizado correctamente")
+    }
+
+    fun borrarUsuarioPorAdmin(
+        usuarioABorrar: Usuario,
+        onResultado: (Boolean, String) -> Unit
+    ) = viewModelScope.launch {
+
+        if (usuario?.id == usuarioABorrar.id) {
+            onResultado(false, "No puedes eliminar tu propio usuario")
+            return@launch
+        }
+
+        repositorioUsuario.borrarUsuario(usuarioABorrar)
+
+        onResultado(true, "Usuario eliminado correctamente")
+    }
+
+
 }
 
 class AppViewModelFactory(
