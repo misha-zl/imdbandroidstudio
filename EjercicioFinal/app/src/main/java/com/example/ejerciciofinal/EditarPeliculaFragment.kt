@@ -32,6 +32,10 @@ class EditarPeliculaFragment : Fragment() {
         comprobarPermisos()
         cargarDatos()
         configurarBotonGuardar()
+
+        binding.btnVolverPeliculas.setOnClickListener {
+            findNavController().popBackStack()
+        }
     }
 
     private fun comprobarPermisos() {

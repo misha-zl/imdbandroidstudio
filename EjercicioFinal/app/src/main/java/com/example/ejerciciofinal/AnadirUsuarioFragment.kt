@@ -75,7 +75,7 @@ class AnadirUsuarioFragment : Fragment() {
             Toast.makeText(requireContext(), mensaje, Toast.LENGTH_SHORT).show()
 
             if (correcto) {
-                findNavController().navigate(R.id.action_anadirUsuarioFragment_to_perfilFragment)
+                findNavController().navigate(R.id.action_anadirUsuarioFragment_to_usuariosFragment)
             }
         }
     }

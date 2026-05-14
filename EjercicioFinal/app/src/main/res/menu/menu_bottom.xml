@@ -3,17 +3,23 @@
 
     <item
         android:id="@+id/inicioFragment"
-        android:icon="@android:drawable/ic_menu_view"
+        android:icon="@drawable/ic_home"
         android:title="Inicio" />
 
     <item
         android:id="@+id/anadirPeliculaFragment"
-        android:icon="@android:drawable/ic_input_add"
+        android:icon="@drawable/ic_add"
         android:title="Añadir" />
+    <item
+        android:id="@+id/usuariosFragment"
+        android:icon="@drawable/ic_usuario"
+        android:title="Usuarios" />
+
 
     <item
         android:id="@+id/perfilFragment"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/ic_perfil"
         android:title="Perfil" />
+
 
 </menu>

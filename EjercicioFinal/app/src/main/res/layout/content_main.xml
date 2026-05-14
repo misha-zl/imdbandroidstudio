@@ -20,21 +20,22 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="0dp"
-        android:layout_height="56dp"
+        android:layout_height="64dp"
+        android:minHeight="64dp"
         android:background="#000000"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp"
 
-        app:itemIconSize="28dp"
+        app:itemIconSize="24dp"
         app:itemIconTint="@color/bottom_nav_icon_colors"
         app:itemTextColor="@color/bottom_nav_text_colors"
         app:itemBackground="@drawable/bottom_nav_item_background"
+        app:itemRippleColor="@android:color/transparent"
         app:itemHorizontalTranslationEnabled="false"
         app:labelVisibilityMode="labeled"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+
 
         app:menu="@menu/menu_bottom" />
 

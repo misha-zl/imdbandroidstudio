@@ -79,7 +79,8 @@ class MainActivity : AppCompatActivity() {
             setOf(
                 R.id.inicioFragment,
                 R.id.anadirPeliculaFragment,
-                R.id.perfilFragment
+                R.id.perfilFragment,
+                R.id.usuariosFragment
             )
         )
 
@@ -114,7 +115,7 @@ class MainActivity : AppCompatActivity() {
                     View.VISIBLE
                 }
 
-            // Actualiza el menú superior.
+            actualizarMenuInferior()
             invalidateOptionsMenu()
         }
     }
@@ -215,5 +216,15 @@ class MainActivity : AppCompatActivity() {
 
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
+    }
+
+    private fun actualizarMenuInferior() {
+        val bottomNavigationView =
+            findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(
+                R.id.bottomNavigationView
+            )
+
+        bottomNavigationView.menu.findItem(R.id.usuariosFragment)?.isVisible =
+            miViewModel.puedeGestionarUsuarios()
     }
 }

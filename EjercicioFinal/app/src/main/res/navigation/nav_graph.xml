@@ -99,22 +99,31 @@
 
     </fragment>
 
+    <!-- MI PERFIL: LO VEN ADMIN Y USUARIO NORMAL -->
     <fragment
         android:id="@+id/perfilFragment"
         android:name="com.example.ejerciciofinal.PerfilFragment"
-        android:label="Perfil"
-        tools:layout="@layout/fragment_perfil">
+        android:label="Mi perfil"
+        tools:layout="@layout/fragment_perfil" />
+
+    <!-- GESTIÓN DE USUARIOS: SOLO ADMIN -->
+    <fragment
+        android:id="@+id/usuariosFragment"
+        android:name="com.example.ejerciciofinal.UsuariosFragment"
+        android:label="Usuarios"
+        tools:layout="@layout/fragment_usuarios">
 
         <action
-            android:id="@+id/action_perfilFragment_to_anadirUsuarioFragment"
+            android:id="@+id/action_usuariosFragment_to_anadirUsuarioFragment"
             app:destination="@id/anadirUsuarioFragment" />
 
         <action
-            android:id="@+id/action_perfilFragment_to_editarUsuarioFragment"
+            android:id="@+id/action_usuariosFragment_to_editarUsuarioFragment"
             app:destination="@id/editarUsuarioFragment" />
 
     </fragment>
 
+    <!-- AÑADIR USUARIO: SOLO ADMIN -->
     <fragment
         android:id="@+id/anadirUsuarioFragment"
         android:name="com.example.ejerciciofinal.AnadirUsuarioFragment"
@@ -122,10 +131,12 @@
         tools:layout="@layout/fragment_anadir_usuario">
 
         <action
-            android:id="@+id/action_anadirUsuarioFragment_to_perfilFragment"
-            app:destination="@id/perfilFragment" />
+            android:id="@+id/action_anadirUsuarioFragment_to_usuariosFragment"
+            app:destination="@id/usuariosFragment" />
 
     </fragment>
+
+    <!-- EDITAR USUARIO: SOLO ADMIN -->
     <fragment
         android:id="@+id/editarUsuarioFragment"
         android:name="com.example.ejerciciofinal.EditarUsuarioFragment"
@@ -133,8 +144,8 @@
         tools:layout="@layout/fragment_editar_usuario">
 
         <action
-            android:id="@+id/action_editarUsuarioFragment_to_perfilFragment"
-            app:destination="@id/perfilFragment" />
+            android:id="@+id/action_editarUsuarioFragment_to_usuariosFragment"
+            app:destination="@id/usuariosFragment" />
 
     </fragment>
 
