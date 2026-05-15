@@ -6,6 +6,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.ejerciciofinal.databinding.FragmentItemUsuarioBinding
 import com.example.ejerciciofinal.modelo.Usuario
 
+import android.net.Uri
+import com.example.ejerciciofinal.R
+
 class AdaptadorUsuario(
     private val listaUsuarios: List<Usuario>,
     private val onEditarUsuario: (Usuario) -> Unit,
@@ -39,6 +42,16 @@ class AdaptadorUsuario(
 
         holder.binding.btnEliminarUsuario.setOnClickListener {
             onEliminarUsuario(usuario)
+        }
+
+        if (usuario.imagenPerfil.isNotBlank()) {
+            try {
+                holder.binding.ivItemFotoUsuario.setImageURI(Uri.parse(usuario.imagenPerfil))
+            } catch (e: Exception) {
+                holder.binding.ivItemFotoUsuario.setImageResource(R.drawable.ic_launcher_background)
+            }
+        } else {
+            holder.binding.ivItemFotoUsuario.setImageResource(R.drawable.ic_launcher_background)
         }
     }
 

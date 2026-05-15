@@ -11,5 +11,6 @@ data class Usuario(
     var nombreUsuario: String,
     var password: String,
     var telefono: String,
-    var rol: String = "NORMAL"
+    var rol: String = "NORMAL",
+    var imagenPerfil: String = ""
 )

@@ -18,15 +18,13 @@
         android:orientation="horizontal"
         android:padding="12dp">
 
-        <TextView
-            android:id="@+id/tvPosterPelicula"
-            android:layout_width="70dp"
-            android:layout_height="95dp"
+        <ImageView
+            android:id="@+id/ivPosterPelicula"
+            android:layout_width="80dp"
+            android:layout_height="110dp"
             android:background="#F5C518"
-            android:gravity="center"
-            android:text="IMG"
-            android:textColor="#000000"
-            android:textStyle="bold" />
+            android:scaleType="centerCrop"
+            android:contentDescription="Imagen película" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -68,7 +66,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:maxLines="2"
-                android:text="Crítica o reseña breve"
+                android:text="Crítica"
                 android:textColor="#000000"
                 android:textSize="13sp" />
 

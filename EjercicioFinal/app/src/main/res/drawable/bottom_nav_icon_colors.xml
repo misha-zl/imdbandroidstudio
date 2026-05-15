@@ -6,7 +6,7 @@
         android:state_checked="true"
         android:color="#000000" />
 
-    <!-- Icono normal: blanco -->
+    <!-- Icono no seleccionado: blanco -->
     <item android:color="#FFFFFF" />
 
 </selector>

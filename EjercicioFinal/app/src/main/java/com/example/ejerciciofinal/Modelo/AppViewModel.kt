@@ -7,8 +7,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
-
-
 class AppViewModel(
     private val repositorioPelicula: RepositorioPelicula,
     private val repositorioUsuario: RepositorioUsuario
@@ -16,31 +14,39 @@ class AppViewModel(
 
     var usuario: Usuario? = null
 
-    var usuarioSeleccionado: Usuario? = null
-
-    val listaUsuarios: LiveData<List<Usuario>> =
-        repositorioUsuario.mostrarUsuarios().asLiveData()
-
     var peliculaSeleccionada: Pelicula? = null
+
+    var usuarioSeleccionado: Usuario? = null
 
     val listaPeliculas: LiveData<List<Pelicula>> =
         repositorioPelicula.mostrarPeliculas().asLiveData()
+
+    val listaUsuarios: LiveData<List<Usuario>> =
+        repositorioUsuario.mostrarUsuarios().asLiveData()
 
     fun seleccionarPelicula(pelicula: Pelicula) {
         peliculaSeleccionada = pelicula
     }
 
+    fun seleccionarUsuario(usuario: Usuario) {
+        usuarioSeleccionado = usuario
+    }
+
     fun cerrarSesion() {
         usuario = null
         peliculaSeleccionada = null
+        usuarioSeleccionado = null
     }
-
 
     fun puedeAñadirPelicula(): Boolean {
         return usuario != null
     }
 
     fun puedeEditarEliminarPelicula(): Boolean {
+        return usuario?.rol == "ADMIN"
+    }
+
+    fun puedeGestionarUsuarios(): Boolean {
         return usuario?.rol == "ADMIN"
     }
 
@@ -81,7 +87,8 @@ class AppViewModel(
             nombreUsuario = nombreUsuario,
             password = password,
             telefono = telefono,
-            rol = "NORMAL"
+            rol = "NORMAL",
+            imagenPerfil = ""
         )
 
         repositorioUsuario.insertarUsuario(nuevoUsuario)
@@ -92,30 +99,18 @@ class AppViewModel(
     fun login(
         nombreUsuario: String,
         password: String,
-        onResultado: (Boolean, String, Usuario?) -> Unit
+        onResultado: (Boolean, Usuario?, String) -> Unit
     ) = viewModelScope.launch {
 
         val usuarioEncontrado =
             repositorioUsuario.login(nombreUsuario, password)
 
         if (usuarioEncontrado == null) {
-            onResultado(false, "Nombre de usuario o contraseña incorrectos", null)
+            onResultado(false, null, "Usuario o contraseña incorrectos")
         } else {
             usuario = usuarioEncontrado
-            onResultado(true, "Login correcto", usuarioEncontrado)
+            onResultado(true, usuarioEncontrado, "Inicio de sesión correcto")
         }
-    }
-
-    fun actualizarUsuario(
-        usuarioActualizado: Usuario,
-        onResultado: (Boolean, String) -> Unit
-    ) = viewModelScope.launch {
-
-        repositorioUsuario.actualizarUsuario(usuarioActualizado)
-
-        usuario = usuarioActualizado
-
-        onResultado(true, "Usuario actualizado correctamente")
     }
 
     fun buscarUsuarioPorId(
@@ -123,80 +118,32 @@ class AppViewModel(
         onResultado: (Usuario?) -> Unit
     ) = viewModelScope.launch {
 
-        val usuarioEncontrado = repositorioUsuario.buscarUsuarioPorId(id)
+        val usuarioEncontrado =
+            repositorioUsuario.buscarUsuarioPorId(id)
 
-        usuario = usuarioEncontrado
+        if (usuarioEncontrado != null) {
+            usuario = usuarioEncontrado
+        }
 
         onResultado(usuarioEncontrado)
     }
 
-    fun insertarDatosIniciales() = viewModelScope.launch {
+    fun actualizarMiFotoPerfil(imagenPerfil: String) = viewModelScope.launch {
+        val usu = usuario ?: return@launch
 
-        val cantidadUsuarios = repositorioUsuario.contarUsuarios()
+        val usuarioActualizado = Usuario(
+            id = usu.id,
+            nombre = usu.nombre,
+            nombreUsuario = usu.nombreUsuario,
+            password = usu.password,
+            telefono = usu.telefono,
+            rol = usu.rol,
+            imagenPerfil = imagenPerfil
+        )
 
-        if (cantidadUsuarios == 0) {
+        repositorioUsuario.actualizarUsuario(usuarioActualizado)
 
-            val usuariosIniciales = listOf(
-                Usuario(
-                    nombre = "Administrador",
-                    nombreUsuario = "admin",
-                    password = "1234",
-                    telefono = "000000000",
-                    rol = "ADMIN"
-                ),
-                Usuario(
-                    nombre = "Usuario Normal",
-                    nombreUsuario = "usuario",
-                    password = "1234",
-                    telefono = "111111111",
-                    rol = "NORMAL"
-                )
-            )
-
-            repositorioUsuario.insertarUsuarios(usuariosIniciales)
-        }
-
-        val cantidadPeliculas = repositorioPelicula.contarPeliculas()
-
-        if (cantidadPeliculas == 0) {
-
-            val peliculasIniciales = listOf(
-                Pelicula(
-                    nombre = "Forrest Gump",
-                    director = "Robert Zemeckis",
-                    anio = 1994,
-                    descripcion = "Historia de Forrest, un hombre sencillo que vive momentos históricos.",
-                    critica = "Película emotiva y muy recomendable.",
-                    imagen = ""
-                ),
-                Pelicula(
-                    nombre = "Pulp Fiction",
-                    director = "Quentin Tarantino",
-                    anio = 1994,
-                    descripcion = "Historias criminales conectadas entre sí.",
-                    critica = "Muy original y con diálogos memorables.",
-                    imagen = ""
-                ),
-                Pelicula(
-                    nombre = "Avatar",
-                    director = "James Cameron",
-                    anio = 2009,
-                    descripcion = "Aventura de ciencia ficción en Pandora.",
-                    critica = "Visualmente espectacular.",
-                    imagen = ""
-                )
-            )
-
-            repositorioPelicula.insertarPeliculas(peliculasIniciales)
-        }
-    }
-
-    fun seleccionarUsuario(usuario: Usuario) {
-        usuarioSeleccionado = usuario
-    }
-
-    fun puedeGestionarUsuarios(): Boolean {
-        return usuario?.rol == "ADMIN"
+        usuario = usuarioActualizado
     }
 
     fun crearUsuarioPorAdmin(
@@ -205,6 +152,7 @@ class AppViewModel(
         password: String,
         telefono: String,
         esAdmin: Boolean,
+        imagenPerfil: String,
         onResultado: (Boolean, String) -> Unit
     ) = viewModelScope.launch {
 
@@ -223,7 +171,8 @@ class AppViewModel(
             nombreUsuario = nombreUsuario,
             password = password,
             telefono = telefono,
-            rol = rol
+            rol = rol,
+            imagenPerfil = imagenPerfil
         )
 
         repositorioUsuario.insertarUsuario(nuevoUsuario)
@@ -268,7 +217,66 @@ class AppViewModel(
         onResultado(true, "Usuario eliminado correctamente")
     }
 
+    fun insertarDatosIniciales() = viewModelScope.launch {
 
+        val cantidadUsuarios = repositorioUsuario.contarUsuarios()
+
+        if (cantidadUsuarios == 0) {
+            val usuariosIniciales = listOf(
+                Usuario(
+                    nombre = "Administrador",
+                    nombreUsuario = "admin",
+                    password = "1234",
+                    telefono = "111111111",
+                    rol = "ADMIN",
+                    imagenPerfil = ""
+                ),
+                Usuario(
+                    nombre = "Usuario Normal",
+                    nombreUsuario = "usuario",
+                    password = "1234",
+                    telefono = "222222222",
+                    rol = "NORMAL",
+                    imagenPerfil = ""
+                )
+            )
+
+            repositorioUsuario.insertarUsuarios(usuariosIniciales)
+        }
+
+        val cantidadPeliculas = repositorioPelicula.contarPeliculas()
+
+        if (cantidadPeliculas == 0) {
+            val peliculasIniciales = listOf(
+                Pelicula(
+                    nombre = "Forrest Gump",
+                    director = "Robert Zemeckis",
+                    anio = 1994,
+                    descripcion = "La historia de Forrest, un hombre sencillo que vive grandes momentos de la historia.",
+                    critica = "Película emotiva y muy conocida.",
+                    imagen = ""
+                ),
+                Pelicula(
+                    nombre = "Pulp Fiction",
+                    director = "Quentin Tarantino",
+                    anio = 1994,
+                    descripcion = "Varias historias criminales se cruzan de forma original.",
+                    critica = "Clásico moderno con mucho estilo.",
+                    imagen = ""
+                ),
+                Pelicula(
+                    nombre = "Avatar",
+                    director = "James Cameron",
+                    anio = 2009,
+                    descripcion = "Un marine llega al planeta Pandora y descubre una nueva forma de vida.",
+                    critica = "Muy visual y espectacular.",
+                    imagen = ""
+                )
+            )
+
+            repositorioPelicula.insertarPeliculas(peliculasIniciales)
+        }
+    }
 }
 
 class AppViewModelFactory(

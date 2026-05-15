@@ -19,7 +19,6 @@ class LoginFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -40,19 +39,10 @@ class LoginFragment : Fragment() {
         val nombreUsuario = binding.etLoginUsuario.text.toString().trim()
         val password = binding.etLoginPassword.text.toString().trim()
 
-        if (nombreUsuario.isBlank()) {
+        if (nombreUsuario.isBlank() || password.isBlank()) {
             Toast.makeText(
                 requireContext(),
-                "Introduce el nombre de usuario",
-                Toast.LENGTH_SHORT
-            ).show()
-            return
-        }
-
-        if (password.isBlank()) {
-            Toast.makeText(
-                requireContext(),
-                "Introduce la contraseña",
+                "Introduce usuario y contraseña",
                 Toast.LENGTH_SHORT
             ).show()
             return
@@ -61,7 +51,7 @@ class LoginFragment : Fragment() {
         (activity as MainActivity).miViewModel.login(
             nombreUsuario,
             password
-        ) { correcto, mensaje, usuario ->
+        ) { correcto, usuario, mensaje ->
 
             Toast.makeText(
                 requireContext(),
@@ -71,14 +61,14 @@ class LoginFragment : Fragment() {
 
             if (correcto && usuario != null) {
 
+                // Guardamos la sesión en SharedPreferences.
                 (activity as MainActivity).guardarSesionEnSharedPreferences(usuario)
 
+                // Navegamos a la pantalla principal.
                 findNavController().navigate(R.id.action_loginFragment_to_inicioFragment)
             }
         }
     }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()

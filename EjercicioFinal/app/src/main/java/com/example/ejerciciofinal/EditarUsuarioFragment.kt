@@ -10,12 +10,42 @@ import androidx.navigation.fragment.findNavController
 import com.example.ejerciciofinal.databinding.FragmentEditarUsuarioBinding
 import com.example.ejerciciofinal.modelo.Usuario
 
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.result.contract.ActivityResultContracts
+
 class EditarUsuarioFragment : Fragment() {
 
     private var _binding: FragmentEditarUsuarioBinding? = null
     private val binding get() = _binding!!
 
     private var usuarioActual: Usuario? = null
+
+    private var imagenSeleccionada: String = ""
+
+    private val seleccionarImagen = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+
+        if (uri != null) {
+            try {
+                requireContext().contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+
+                imagenSeleccionada = uri.toString()
+                binding.ivEditarUsuarioFoto.setImageURI(uri)
+
+            } catch (e: Exception) {
+                Toast.makeText(
+                    requireContext(),
+                    "No se pudo cargar la imagen",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,6 +74,10 @@ class EditarUsuarioFragment : Fragment() {
         binding.btnVolverListaUsuarios.setOnClickListener {
             findNavController().navigate(R.id.action_editarUsuarioFragment_to_usuariosFragment)
         }
+
+        binding.btnSeleccionarFotoEditarUsuario.setOnClickListener {
+            seleccionarImagen.launch(arrayOf("image/*"))
+        }
     }
 
     private fun cargarDatos() {
@@ -62,6 +96,18 @@ class EditarUsuarioFragment : Fragment() {
         binding.etEditarUsuarioPassword.setText(usuario.password)
         binding.etEditarUsuarioTelefono.setText(usuario.telefono)
         binding.cbEditarUsuarioAdmin.isChecked = usuario.rol == "ADMIN"
+
+        imagenSeleccionada = usuario.imagenPerfil
+
+        if (usuario.imagenPerfil.isNotBlank()) {
+            try {
+                binding.ivEditarUsuarioFoto.setImageURI(Uri.parse(usuario.imagenPerfil))
+            } catch (e: Exception) {
+                binding.ivEditarUsuarioFoto.setImageResource(R.drawable.ic_launcher_background)
+            }
+        } else {
+            binding.ivEditarUsuarioFoto.setImageResource(R.drawable.ic_launcher_background)
+        }
     }
 
     private fun guardarCambios() {
@@ -99,7 +145,8 @@ class EditarUsuarioFragment : Fragment() {
             nombreUsuario = nombreUsuario,
             password = password,
             telefono = telefono,
-            rol = rol
+            rol = rol,
+            imagenPerfil = imagenSeleccionada
         )
 
         (activity as MainActivity).miViewModel.actualizarUsuarioPorAdmin(usuarioEditado) { correcto, mensaje ->

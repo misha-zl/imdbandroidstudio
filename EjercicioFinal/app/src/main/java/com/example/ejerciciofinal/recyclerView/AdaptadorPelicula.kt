@@ -1,8 +1,10 @@
 package com.example.ejerciciofinal.recyclerView
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.ejerciciofinal.R
 import com.example.ejerciciofinal.databinding.FragmentItemPeliculaBinding
 import com.example.ejerciciofinal.modelo.Pelicula
 
@@ -33,8 +35,15 @@ class AdaptadorPelicula(
         holder.binding.tvAnioPelicula.text = "Año: ${pelicula.anio}"
         holder.binding.tvCriticaPelicula.text = pelicula.critica
 
-        holder.binding.tvPosterPelicula.text =
-            pelicula.nombre.firstOrNull()?.toString() ?: "IMG"
+        if (pelicula.imagen.isNotBlank()) {
+            try {
+                holder.binding.ivPosterPelicula.setImageURI(Uri.parse(pelicula.imagen))
+            } catch (e: Exception) {
+                holder.binding.ivPosterPelicula.setImageResource(R.drawable.ic_launcher_background)
+            }
+        } else {
+            holder.binding.ivPosterPelicula.setImageResource(R.drawable.ic_launcher_background)
+        }
 
         holder.binding.itemPelicula.setOnClickListener {
             onClickPelicula(pelicula)

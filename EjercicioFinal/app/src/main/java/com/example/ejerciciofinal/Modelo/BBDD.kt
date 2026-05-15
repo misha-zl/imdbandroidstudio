@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [Pelicula::class, Usuario::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class BBDD : RoomDatabase() {
@@ -28,7 +28,9 @@ abstract class BBDD : RoomDatabase() {
                     context.applicationContext,
                     BBDD::class.java,
                     "imdb_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
 
                 INSTANCE = instance
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F7F7F7">
@@ -13,7 +14,7 @@
         <Button
             android:id="@+id/btnVolverPeliculas"
             android:layout_width="73dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_marginBottom="12dp"
             android:backgroundTint="#000000"
             android:text="←"
@@ -21,17 +22,14 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/tvDetallePoster"
+        <ImageView
+            android:id="@+id/ivDetallePoster"
             android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:layout_height="220dp"
+            android:layout_marginBottom="24dp"
             android:background="#F5C518"
-            android:gravity="center"
-            android:text="IMDb"
-            android:textColor="#000000"
-            android:textSize="34sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="24dp" />
+            android:scaleType="centerCrop"
+            android:contentDescription="Imagen detalle película" />
 
         <TextView
             android:id="@+id/tvDetalleNombre"

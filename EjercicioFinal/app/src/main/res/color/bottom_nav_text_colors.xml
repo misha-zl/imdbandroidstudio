@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Texto seleccionado: amarillo IMDb -->
+    <!-- Texto seleccionado: negro -->
     <item
-        android:color="#F5C518"
-        android:state_checked="true" />
+        android:state_checked="true"
+        android:color="#000000" />
 
-    <!-- Texto no seleccionado: blanco -->
+    <!-- Texto normal: blanco -->
     <item android:color="#FFFFFF" />
 
 </selector>

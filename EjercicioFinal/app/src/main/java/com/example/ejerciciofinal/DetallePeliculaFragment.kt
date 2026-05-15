@@ -1,6 +1,7 @@
 package com.example.ejerciciofinal
 
 import android.app.AlertDialog
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,7 +31,10 @@ class DetallePeliculaFragment : Fragment() {
         cargarDatosPelicula()
         controlarBotonesAdmin()
         configurarBotones()
-        configurarBotonVolver()
+
+        binding.btnVolverPeliculas.setOnClickListener {
+            findNavController().popBackStack()
+        }
     }
 
     private fun cargarDatosPelicula() {
@@ -47,7 +51,16 @@ class DetallePeliculaFragment : Fragment() {
             return
         }
 
-        binding.tvDetallePoster.text = pelicula.nombre.firstOrNull()?.toString() ?: "IMDb"
+        if (pelicula.imagen.isNotBlank()) {
+            try {
+                binding.ivDetallePoster.setImageURI(Uri.parse(pelicula.imagen))
+            } catch (e: Exception) {
+                binding.ivDetallePoster.setImageResource(R.drawable.ic_launcher_background)
+            }
+        } else {
+            binding.ivDetallePoster.setImageResource(R.drawable.ic_launcher_background)
+        }
+
         binding.tvDetalleNombre.text = pelicula.nombre
         binding.tvDetalleDirector.text = "Director: ${pelicula.director}"
         binding.tvDetalleAnio.text = "Año: ${pelicula.anio}"
@@ -56,9 +69,10 @@ class DetallePeliculaFragment : Fragment() {
     }
 
     private fun controlarBotonesAdmin() {
-        val esAdmin = (activity as MainActivity).miViewModel.puedeEditarEliminarPelicula()
+        val puedeEditarEliminar =
+            (activity as MainActivity).miViewModel.puedeEditarEliminarPelicula()
 
-        if (esAdmin) {
+        if (puedeEditarEliminar) {
             binding.btnEditarPelicula.visibility = View.VISIBLE
             binding.btnEliminarPelicula.visibility = View.VISIBLE
         } else {
@@ -73,11 +87,11 @@ class DetallePeliculaFragment : Fragment() {
         }
 
         binding.btnEliminarPelicula.setOnClickListener {
-            confirmarEliminar()
+            confirmarEliminarPelicula()
         }
     }
 
-    private fun confirmarEliminar() {
+    private fun confirmarEliminarPelicula() {
         val pelicula = (activity as MainActivity).miViewModel.peliculaSeleccionada
 
         if (pelicula == null) {
@@ -106,12 +120,6 @@ class DetallePeliculaFragment : Fragment() {
             }
             .setNegativeButton("Cancelar", null)
             .show()
-    }
-
-    private fun configurarBotonVolver() {
-        binding.btnVolverPeliculas.setOnClickListener {
-            findNavController().navigate(R.id.action_detallePeliculaFragment_to_inicioFragment)
-        }
     }
 
     override fun onDestroyView() {

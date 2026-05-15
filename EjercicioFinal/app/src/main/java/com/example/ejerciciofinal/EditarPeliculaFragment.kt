@@ -1,10 +1,13 @@
 package com.example.ejerciciofinal
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.ejerciciofinal.databinding.FragmentEditarPeliculaBinding
@@ -16,6 +19,31 @@ class EditarPeliculaFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var peliculaActual: Pelicula? = null
+    private var imagenSeleccionada: String = ""
+
+    private val seleccionarImagen = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+
+        if (uri != null) {
+            try {
+                requireContext().contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+
+                imagenSeleccionada = uri.toString()
+                binding.ivEditarPreviewPelicula.setImageURI(uri)
+
+            } catch (e: Exception) {
+                Toast.makeText(
+                    requireContext(),
+                    "No se pudo cargar la imagen",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,10 +64,15 @@ class EditarPeliculaFragment : Fragment() {
         binding.btnVolverPeliculas.setOnClickListener {
             findNavController().popBackStack()
         }
+
+        binding.btnEditarImagenPelicula.setOnClickListener {
+            seleccionarImagen.launch(arrayOf("image/*"))
+        }
     }
 
     private fun comprobarPermisos() {
-        val puedeEditar = (activity as MainActivity).miViewModel.puedeEditarEliminarPelicula()
+        val puedeEditar =
+            (activity as MainActivity).miViewModel.puedeEditarEliminarPelicula()
 
         if (!puedeEditar) {
             Toast.makeText(
@@ -67,6 +100,13 @@ class EditarPeliculaFragment : Fragment() {
         }
 
         peliculaActual = pelicula
+        imagenSeleccionada = pelicula.imagen
+
+        if (pelicula.imagen.isNotBlank()) {
+            binding.ivEditarPreviewPelicula.setImageURI(Uri.parse(pelicula.imagen))
+        } else {
+            binding.ivEditarPreviewPelicula.setImageResource(R.drawable.ic_launcher_background)
+        }
 
         binding.etEditarNombre.setText(pelicula.nombre)
         binding.etEditarDirector.setText(pelicula.director)
@@ -132,7 +172,7 @@ class EditarPeliculaFragment : Fragment() {
             anio = anio,
             descripcion = descripcion,
             critica = critica,
-            imagen = pelicula.imagen
+            imagen = imagenSeleccionada
         )
 
         (activity as MainActivity).miViewModel.seleccionarPelicula(peliculaEditada)
