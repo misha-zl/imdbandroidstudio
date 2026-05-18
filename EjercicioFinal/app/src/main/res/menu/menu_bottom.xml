@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/inicioFragment"
@@ -14,7 +15,8 @@
     <item
         android:id="@+id/usuariosFragment"
         android:icon="@drawable/ic_usuario"
-        android:title="Editar&#10;Usuario" />
+        android:title="Editar&#10;Usuario"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/perfilFragment"

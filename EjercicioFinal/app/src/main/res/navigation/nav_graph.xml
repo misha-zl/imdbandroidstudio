@@ -55,9 +55,9 @@
     <!-- AÑADIR PELÍCULA -->
     <fragment
         android:id="@+id/anadirPeliculaFragment"
-        android:name="com.example.ejerciciofinal.AddPeliculaFragment"
+        android:name="com.example.ejerciciofinal.AnadirPeliculaFragment"
         android:label="Añadir película"
-        tools:layout="@layout/fragment_add_pelicula">
+        tools:layout="@layout/fragment_anadir_pelicula">
 
         <action
             android:id="@+id/action_anadirPeliculaFragment_to_inicioFragment"

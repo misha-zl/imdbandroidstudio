@@ -229,7 +229,7 @@ class AppViewModel(
                     password = "1234",
                     telefono = "111111111",
                     rol = "ADMIN",
-                    imagenPerfil = ""
+                    imagenPerfil = "monoadmin"
                 ),
                 Usuario(
                     nombre = "Usuario Normal",
@@ -237,7 +237,7 @@ class AppViewModel(
                     password = "1234",
                     telefono = "222222222",
                     rol = "NORMAL",
-                    imagenPerfil = ""
+                    imagenPerfil = "moinkey"
                 )
             )
 
@@ -254,7 +254,7 @@ class AppViewModel(
                     anio = 1994,
                     descripcion = "La historia de Forrest, un hombre sencillo que vive grandes momentos de la historia.",
                     critica = "Película emotiva y muy conocida.",
-                    imagen = ""
+                    imagen = "forrest"
                 ),
                 Pelicula(
                     nombre = "Pulp Fiction",
@@ -262,7 +262,7 @@ class AppViewModel(
                     anio = 1994,
                     descripcion = "Varias historias criminales se cruzan de forma original.",
                     critica = "Clásico moderno con mucho estilo.",
-                    imagen = ""
+                    imagen = "pulpfiction"
                 ),
                 Pelicula(
                     nombre = "Avatar",
@@ -270,7 +270,7 @@ class AppViewModel(
                     anio = 2009,
                     descripcion = "Un marine llega al planeta Pandora y descubre una nueva forma de vida.",
                     critica = "Muy visual y espectacular.",
-                    imagen = ""
+                    imagen = "avatar"
                 )
             )
 
@@ -278,6 +278,8 @@ class AppViewModel(
         }
     }
 }
+
+
 
 class AppViewModelFactory(
     private val repositorioPelicula: RepositorioPelicula,

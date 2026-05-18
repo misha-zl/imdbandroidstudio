@@ -12,13 +12,13 @@
 
         <Button
             android:id="@+id/btnVolverDetalle"
-            android:layout_width="48dp"
+            android:layout_width="73dp"
             android:layout_height="48dp"
             android:layout_marginBottom="12dp"
             android:backgroundTint="#000000"
-            android:text="‹"
+            android:text="←"
             android:textColor="#FFFFFF"
-            android:textSize="32sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
         <TextView

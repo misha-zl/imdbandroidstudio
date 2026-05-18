@@ -9,12 +9,13 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.ejerciciofinal.databinding.FragmentAddPeliculaBinding
+import com.example.ejerciciofinal.databinding.FragmentAnadirPeliculaBinding
 import com.example.ejerciciofinal.modelo.Pelicula
+import androidx.navigation.NavOptions
 
-class AddPeliculaFragment : Fragment() {
+class AnadirPeliculaFragment : Fragment() {
 
-    private var _binding: FragmentAddPeliculaBinding? = null
+    private var _binding: FragmentAnadirPeliculaBinding? = null
     private val binding get() = _binding!!
 
     private var imagenSeleccionada: String = ""
@@ -48,7 +49,7 @@ class AddPeliculaFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentAddPeliculaBinding.inflate(inflater, container, false)
+        _binding = FragmentAnadirPeliculaBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -114,8 +115,28 @@ class AddPeliculaFragment : Fragment() {
             Toast.LENGTH_SHORT
         ).show()
 
-        findNavController().navigate(R.id.action_anadirPeliculaFragment_to_inicioFragment)
+        limpiarFormulario()
+
+        val opciones = NavOptions.Builder()
+            .setPopUpTo(R.id.inicioFragment, false)
+            .setLaunchSingleTop(true)
+            .build()
+        findNavController().popBackStack()
+        findNavController().navigate(R.id.inicioFragment, null, opciones)
     }
+
+    private fun limpiarFormulario() {
+        binding.etAddNombre.text.clear()
+        binding.etAddDirector.text.clear()
+        binding.etAddAnio.text.clear()
+        binding.etAddDescripcion.text.clear()
+        binding.etAddCritica.text.clear()
+
+        imagenSeleccionada = ""
+
+        binding.ivPreviewPelicula.setImageResource(R.drawable.ic_launcher_background)
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
