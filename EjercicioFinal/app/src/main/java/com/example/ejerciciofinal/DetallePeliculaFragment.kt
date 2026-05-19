@@ -116,6 +116,7 @@ class DetallePeliculaFragment : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
 
+
                 findNavController().navigate(R.id.action_detallePeliculaFragment_to_inicioFragment)
             }
             .setNegativeButton("Cancelar", null)

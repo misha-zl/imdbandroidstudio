@@ -23,19 +23,39 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+
     <Button
         android:id="@+id/btnAnadirUsuario"
         android:layout_width="0dp"
         android:layout_height="48dp"
+        android:layout_marginTop="18dp"
+        android:backgroundTint="#F5C518"
         android:text="Añadir usuario"
         android:textColor="#000000"
         android:textStyle="bold"
-        android:backgroundTint="#F5C518"
-        android:layout_marginTop="18dp"
-        app:layout_constraintWidth_percent="0.9"
-        app:layout_constraintTop_toBottomOf="@id/tvTituloGestionUsuarios"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/etBuscarUsuario"
+        app:layout_constraintWidth_percent="0.9" />
+
+
+    <EditText
+        android:id="@+id/etBuscarUsuario"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="18dp"
+        android:backgroundTint="#DDDDDD"
+        android:hint="Buscar por usuario o telf"
+        android:inputType="text"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:textColor="#000000"
+        android:textColorHint="#777777"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.428"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloGestionUsuarios"
+        app:layout_constraintWidth_percent="0.88" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvUsuarios"

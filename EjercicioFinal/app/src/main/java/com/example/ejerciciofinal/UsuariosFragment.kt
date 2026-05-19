@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +18,8 @@ class UsuariosFragment : Fragment() {
 
     private var _binding: FragmentUsuariosBinding? = null
     private val binding get() = _binding!!
+
+    private var listaUsuariosCompleta: List<Usuario> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,6 +34,8 @@ class UsuariosFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         comprobarPermisos()
+        configurarRecyclerView()
+        configurarBuscador()
         cargarUsuarios()
 
         binding.btnAnadirUsuario.setOnClickListener {
@@ -52,22 +57,62 @@ class UsuariosFragment : Fragment() {
         }
     }
 
-    private fun cargarUsuarios() {
+    private fun configurarRecyclerView() {
         binding.rvUsuarios.layoutManager = LinearLayoutManager(requireContext())
+    }
 
+    private fun cargarUsuarios() {
         (activity as MainActivity).miViewModel.listaUsuarios.observe(viewLifecycleOwner) { usuarios ->
 
-            binding.rvUsuarios.adapter = AdaptadorUsuario(
-                usuarios,
-                onEditarUsuario = { usuario ->
-                    (activity as MainActivity).miViewModel.seleccionarUsuario(usuario)
-                    findNavController().navigate(R.id.action_usuariosFragment_to_editarUsuarioFragment)
-                },
-                onEliminarUsuario = { usuario ->
-                    confirmarEliminarUsuario(usuario)
-                }
-            )
+            listaUsuariosCompleta = usuarios
+
+            aplicarFiltro(binding.etBuscarUsuario.text.toString())
         }
+    }
+
+    private fun configurarBuscador() {
+        binding.etBuscarUsuario.addTextChangedListener { texto ->
+
+            aplicarFiltro(texto.toString())
+        }
+    }
+
+    private fun aplicarFiltro(textoBuscado: String) {
+        val texto = textoBuscado.trim()
+
+        val listaFiltrada = if (texto.isBlank()) {
+            listaUsuariosCompleta
+        } else {
+            listaUsuariosCompleta.filter { usuario ->
+
+                usuario.nombreUsuario.contains(
+                    texto,
+                    ignoreCase = true
+                ) ||
+                        usuario.telefono.contains(
+                            texto,
+                            ignoreCase = true
+                        )
+            }
+        }
+
+        mostrarUsuarios(listaFiltrada)
+    }
+
+    private fun mostrarUsuarios(usuarios: List<Usuario>) {
+        binding.rvUsuarios.adapter = AdaptadorUsuario(
+            usuarios,
+            onEditarUsuario = { usuario ->
+
+                (activity as MainActivity).miViewModel.seleccionarUsuario(usuario)
+
+                findNavController().navigate(R.id.action_usuariosFragment_to_editarUsuarioFragment)
+            },
+            onEliminarUsuario = { usuario ->
+
+                confirmarEliminarUsuario(usuario)
+            }
+        )
     }
 
     private fun confirmarEliminarUsuario(usuario: Usuario) {
