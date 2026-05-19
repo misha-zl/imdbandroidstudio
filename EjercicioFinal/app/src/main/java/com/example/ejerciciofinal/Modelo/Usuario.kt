@@ -3,6 +3,8 @@ package com.example.ejerciciofinal.modelo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+/*Se crea las tablas en las entidades, se indican las columnas de la tabla*/
+
 @Entity(tableName = "usuarios")
 data class Usuario(
     @PrimaryKey(autoGenerate = true)

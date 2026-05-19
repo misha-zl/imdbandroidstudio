@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
+/*Aqui estan las consultas a la base de datos*/
 @Dao
 interface PeliculaDAO {
 

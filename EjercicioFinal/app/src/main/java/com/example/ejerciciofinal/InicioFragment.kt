@@ -47,6 +47,9 @@ class InicioFragment : Fragment() {
             binding.tvInicio.text = "Bienvenido"
         }
     }
+    /*Estoy mirando la lista de películas.
+Cuando Room me mande películas, las guardo y las muestro.*/
+
 
     private fun cargarRecyclerView() {
         binding.rvPeliculas.layoutManager = LinearLayoutManager(requireContext())
@@ -62,18 +65,6 @@ class InicioFragment : Fragment() {
             aplicarFiltro(binding.etBuscarInicio.text.toString())
         }
     }
-
-    private fun configurarBuscador() {
-
-        // Esto se ejecuta cada vez que escribes una letra en el buscador.
-        binding.etBuscarInicio.addTextChangedListener { texto ->
-
-            val textoBuscado = texto.toString()
-
-            aplicarFiltro(textoBuscado)
-        }
-    }
-
     private fun aplicarFiltro(textoBuscado: String) {
 
         val listaFiltrada = if (textoBuscado.isBlank()) {
@@ -96,6 +87,10 @@ class InicioFragment : Fragment() {
         mostrarPeliculas(listaFiltrada)
     }
 
+    /*Coge esta lista de películas.
+    Mándasela al AdaptadorPelicula.
+    Cuando pulse una película, guárdala como seleccionada.
+    Después abre el detalle*/
     private fun mostrarPeliculas(lista: List<Pelicula>) {
 
         binding.rvPeliculas.adapter = AdaptadorPelicula(lista) { peliculaPulsada ->
@@ -107,6 +102,21 @@ class InicioFragment : Fragment() {
             findNavController().navigate(R.id.action_inicioFragment_to_detallePeliculaFragment)
         }
     }
+
+
+
+
+    private fun configurarBuscador() {
+
+        // Esto se ejecuta cada vez que escribes una letra en el buscador.
+        binding.etBuscarInicio.addTextChangedListener { texto ->
+
+            val textoBuscado = texto.toString()
+
+            aplicarFiltro(textoBuscado)
+        }
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

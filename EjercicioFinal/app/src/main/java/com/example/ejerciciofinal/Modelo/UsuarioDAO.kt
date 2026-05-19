@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UsuarioDAO {
 
+
+    /*Aqui estan las consultas a la base de datos*/
     @Query("SELECT * FROM usuarios ORDER BY rol ASC, nombreUsuario ASC")
     fun mostrarUsuarios(): Flow<List<Usuario>>
 

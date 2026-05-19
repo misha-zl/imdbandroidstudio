@@ -3,6 +3,8 @@ package com.example.ejerciciofinal.modelo
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.flow.Flow
 
+
+/*El repositorio hace de itermediario entre DAO y elViewModel*/
 class RepositorioUsuario(
     private val usuarioDAO: UsuarioDAO
 ) {

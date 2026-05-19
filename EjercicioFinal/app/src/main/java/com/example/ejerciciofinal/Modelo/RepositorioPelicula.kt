@@ -4,12 +4,15 @@ import androidx.annotation.WorkerThread
 import kotlinx.coroutines.flow.Flow
 
 class RepositorioPelicula(
+
+    /*El repositorio hace de itermediario entre DAO y elViewModel*/
     private val peliculaDAO: PeliculaDAO
 ) {
 
     fun mostrarPeliculas(): Flow<List<Pelicula>> {
         return peliculaDAO.mostrarPeliculas()
     }
+    /*Por si acaso..*/
 
     fun buscarPeliculas(texto: String): Flow<List<Pelicula>> {
         return peliculaDAO.buscarPeliculas(texto)

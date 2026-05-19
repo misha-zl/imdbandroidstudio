@@ -6,6 +6,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+/*View model guarda datos importantes de la app*/
+/*las listas vienen de ROOM
+Quiero tener una lista viva de películas.
+Quiero tener una lista viva de usuarios.
+Cuando cambie Room, se actualiza la pantalla.
+ */
+
+/*Tambien estan las funciones de insertar,actualizar y borrar*/
+
 
 class AppViewModel(
     private val repositorioPelicula: RepositorioPelicula,
