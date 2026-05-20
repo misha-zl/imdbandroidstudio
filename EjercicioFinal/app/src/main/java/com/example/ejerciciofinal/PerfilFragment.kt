@@ -87,10 +87,10 @@ class PerfilFragment : Fragment() {
             try {
                 binding.ivFotoPerfil.setImageURI(Uri.parse(usuario.imagenPerfil))
             } catch (e: Exception) {
-                binding.ivFotoPerfil.setImageResource(R.drawable.ic_launcher_background)
+                binding.ivFotoPerfil.setImageResource(R.drawable.no_foto)
             }
         } else {
-            binding.ivFotoPerfil.setImageResource(R.drawable.ic_launcher_background)
+            binding.ivFotoPerfil.setImageResource(R.drawable.no_foto)
         }
 
         binding.tvDatosPerfil.text =

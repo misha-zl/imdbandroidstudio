@@ -49,10 +49,10 @@ class AdaptadorPelicula(
             try {
                 holder.binding.ivPosterPelicula.setImageURI(Uri.parse(pelicula.imagen))
             } catch (e: Exception) {
-                holder.binding.ivPosterPelicula.setImageResource(R.drawable.ic_launcher_background)
+                holder.binding.ivPosterPelicula.setImageResource(R.drawable.no_foto)
             }
         } else {
-            holder.binding.ivPosterPelicula.setImageResource(R.drawable.ic_launcher_background)
+            holder.binding.ivPosterPelicula.setImageResource(R.drawable.no_foto)
         }
 
         holder.binding.itemPelicula.setOnClickListener {

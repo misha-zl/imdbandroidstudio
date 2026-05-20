@@ -48,10 +48,10 @@ class AdaptadorUsuario(
             try {
                 holder.binding.ivItemFotoUsuario.setImageURI(Uri.parse(usuario.imagenPerfil))
             } catch (e: Exception) {
-                holder.binding.ivItemFotoUsuario.setImageResource(R.drawable.ic_launcher_background)
+                holder.binding.ivItemFotoUsuario.setImageResource(R.drawable.no_foto)
             }
         } else {
-            holder.binding.ivItemFotoUsuario.setImageResource(R.drawable.ic_launcher_background)
+            holder.binding.ivItemFotoUsuario.setImageResource(R.drawable.no_foto)
         }
     }
 

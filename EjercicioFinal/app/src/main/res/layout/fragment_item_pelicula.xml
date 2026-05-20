@@ -24,6 +24,7 @@
             android:layout_height="110dp"
             android:background="#F5C518"
             android:scaleType="centerCrop"
+            android:src="@drawable/no_foto"
             android:contentDescription="Imagen película" />
 
         <LinearLayout

@@ -27,7 +27,7 @@
             android:background="#F5C518"
             android:scaleType="centerCrop"
             android:contentDescription="Foto usuario"
-            android:src="@drawable/ic_launcher_background" />
+            android:src="@drawable/no_foto" />
 
 
 

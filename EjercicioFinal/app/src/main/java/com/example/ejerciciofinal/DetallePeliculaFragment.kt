@@ -55,10 +55,10 @@ class DetallePeliculaFragment : Fragment() {
             try {
                 binding.ivDetallePoster.setImageURI(Uri.parse(pelicula.imagen))
             } catch (e: Exception) {
-                binding.ivDetallePoster.setImageResource(R.drawable.ic_launcher_background)
+                binding.ivDetallePoster.setImageResource(R.drawable.no_foto)
             }
         } else {
-            binding.ivDetallePoster.setImageResource(R.drawable.ic_launcher_background)
+            binding.ivDetallePoster.setImageResource(R.drawable.no_foto)
         }
 
         binding.tvDetalleNombre.text = pelicula.nombre

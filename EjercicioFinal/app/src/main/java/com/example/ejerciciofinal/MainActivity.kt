@@ -209,16 +209,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
+
+        /*Busco el contenedor de fragments.
+        Saco de ahí el NavController.*/
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
 
         val navController = navHostFragment.navController
 
+        /*El navcontroller es el que controla la navegación.*/
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
     }
 
     private fun actualizarMenuInferior() {
+
+        /*Menú inferior, cuando pulse un botón, usa este navController para cambiar de pantalla.*/
+
         val bottomNavigationView =
             findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(
                 R.id.bottomNavigationView

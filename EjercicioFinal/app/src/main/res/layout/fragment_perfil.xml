@@ -28,7 +28,7 @@
             android:background="#F5C518"
             android:contentDescription="Foto de perfil"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_background" />
+            android:src="@drawable/no_foto" />
 
         <TextView
             android:id="@+id/tvTituloPerfil"

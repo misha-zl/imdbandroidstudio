@@ -39,7 +39,7 @@
             android:background="#DDDDDD"
             android:scaleType="centerCrop"
             android:contentDescription="Foto nuevo usuario"
-            android:src="@drawable/ic_launcher_background" />
+            android:src="@drawable/no_foto" /> />
 
         <Button
             android:id="@+id/btnSeleccionarFotoNuevoUsuario"

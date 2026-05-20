@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Aqui se definen las pestañas de abajo -->
+
+<!-- cada boton tiene android:id
+→ Identifica a qué pantalla debe ir.
+
+android:icon
+→ Icono que se ve en el menú.
+
+android:title
+→ Texto que aparece debajo del icono.-->
+<!-- El id del menú tiene que coincidir con el id del fragment en nav_graph.xml.-->
+
+
+
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item

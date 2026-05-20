@@ -288,22 +288,44 @@ class AppViewModel(
     }
 }
 
+/*Esta clase sirve para crear AppViewModel pasándole los repositorios.*/
+
+
 class AppViewModelFactory(
+    // Guardamos el repositorio de películas.
+    // Este repositorio permite al ViewModel trabajar con las películas:
+    // insertar, actualizar, borrar, mostrar, etc.
     private val repositorioPelicula: RepositorioPelicula,
+
+    // Guardamos el repositorio de usuarios.
+    // Este repositorio permite al ViewModel trabajar con los usuarios:
+    // login, registro, editar usuario, borrar usuario, etc.
     private val repositorioUsuario: RepositorioUsuario
+
+// Esta clase hereda de ViewModelProvider.Factory.
+// Sirve para poder crear un ViewModel que necesita recibir datos por constructor.
 ) : ViewModelProvider.Factory {
 
+    // Esta función se ejecuta automáticamente cuando Android necesita crear el ViewModel.
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
 
+        // Comprobamos si el ViewModel que Android quiere crear es AppViewModel.
         if (modelClass.isAssignableFrom(AppViewModel::class.java)) {
 
+            // Kotlin puede mostrar una advertencia porque estamos convirtiendo AppViewModel a T.
+            // Nosotros sabemos que es correcto, por eso ocultamos esa advertencia.
             @Suppress("UNCHECKED_CAST")
+
+            // Creamos el AppViewModel y le pasamos los dos repositorios que necesita.
+            // Sin esta Factory, Android no sabría cómo pasarle estos repositorios al ViewModel.
             return AppViewModel(
                 repositorioPelicula,
                 repositorioUsuario
             ) as T
         }
 
+        // Si Android intenta crear otro ViewModel diferente a AppViewModel,
+        // lanzamos un error porque esta Factory solo sabe crear AppViewModel.
         throw IllegalArgumentException("ViewModel desconocido")
     }
 }
