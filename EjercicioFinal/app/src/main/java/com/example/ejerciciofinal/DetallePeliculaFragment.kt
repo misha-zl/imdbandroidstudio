@@ -105,7 +105,7 @@ class DetallePeliculaFragment : Fragment() {
 
         AlertDialog.Builder(requireContext())
             .setTitle("Eliminar película")
-            .setMessage("¿Seguro que quieres eliminar ${pelicula.nombre}?")
+            .setMessage("¿Seguro que quieres eliminar la película?")
             .setPositiveButton("Eliminar") { _, _ ->
 
                 (activity as MainActivity).miViewModel.borrarPelicula(pelicula)

@@ -68,6 +68,10 @@ class AnadirUsuarioFragment : Fragment() {
         binding.btnSeleccionarFotoNuevoUsuario.setOnClickListener {
             seleccionarImagen.launch(arrayOf("image/*"))
         }
+
+        binding.btnVolverListaUsuarios.setOnClickListener {
+            findNavController().navigate(R.id.action_anadirUsuarioFragment_to_usuariosFragment)
+        }
     }
 
     private fun guardarUsuario() {

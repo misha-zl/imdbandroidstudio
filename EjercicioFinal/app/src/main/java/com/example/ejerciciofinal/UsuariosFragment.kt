@@ -118,7 +118,7 @@ class UsuariosFragment : Fragment() {
     private fun confirmarEliminarUsuario(usuario: Usuario) {
         AlertDialog.Builder(requireContext())
             .setTitle("Eliminar usuario")
-            .setMessage("¿Seguro que quieres eliminar a ${usuario.nombreUsuario}?")
+            .setMessage("¿Seguro que quieres eliminar usuario?")
             .setPositiveButton("Eliminar") { _, _ ->
 
                 (activity as MainActivity).miViewModel.borrarUsuarioPorAdmin(usuario) { _, mensaje ->

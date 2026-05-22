@@ -280,7 +280,35 @@ class AppViewModel(
                     descripcion = "Un marine llega al planeta Pandora y descubre una nueva forma de vida.",
                     critica = "Muy visual y espectacular.",
                     imagen = ""
+                ),
+                Pelicula(
+                    nombre = "El Señor de los Anillos",
+                    director = "Peter Jackson",
+                    anio = 2001,
+                    descripcion = "Un hobbit comienza un viaje para destruir un anillo con gran poder.",
+                    critica = "Una aventura fantástica muy completa y espectacular.",
+                    imagen = ""
+                ),
+                Pelicula(
+                    nombre = "El Caballero Oscuro",
+                    director = "Christopher Nolan",
+                    anio = 2008,
+                    descripcion = "Batman se enfrenta al Joker, un criminal que quiere sembrar el caos en Gotham.",
+                    critica = "Una de las películas de superhéroes más valoradas.",
+                    imagen = ""
+                ),
+                Pelicula(
+                    nombre = "Blade Runner",
+                    director = "Ridley Scott",
+                    anio = 1982,
+                    descripcion = "Un policía especial debe encontrar a unos replicantes en una ciudad futurista.",
+                    critica = "Película de ciencia ficción con una ambientación muy potente.",
+                    imagen = ""
                 )
+
+
+
+
             )
 
             repositorioPelicula.insertarPeliculas(peliculasIniciales)
