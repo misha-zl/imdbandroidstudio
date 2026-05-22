@@ -44,6 +44,8 @@ class UsuariosFragment : Fragment() {
     }
 
     private fun comprobarPermisos() {
+
+        // Comprobamos si el usuario es ADMIN usando el ViewModel.puedeGestionarUsuarios().
         val esAdmin = (activity as MainActivity).miViewModel.puedeGestionarUsuarios()
 
         if (!esAdmin) {

@@ -24,21 +24,59 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
+    /*
+    AppBarConfiguration sirve para configurar la barra superior de la app.
+
+    Aquí le diremos cuáles son las pantallas principales.
+    En las pantallas principales normalmente no aparece la flecha de volver.
+    */
     private lateinit var appBarConfiguration: AppBarConfiguration
+
+    /*
+    binding nos permite acceder a los elementos del XML activity_main.xml
+    sin usar findViewById todo el rato.
+    */
     private lateinit var binding: ActivityMainBinding
 
+    /*
+    Creamos la base de datos Room.
+
+    by lazy significa que la base de datos no se crea hasta que se usa por primera vez.
+    Esto evita crearla antes de tiempo.
+    */
     val miBBDD by lazy {
         BBDD.getDatabase(this)
     }
 
+    /*
+    Creamos el repositorio de películas.
+
+    El repositorio es el puente entre el ViewModel y el DAO.
+    Aquí le pasamos el DAO de películas que viene de la base de datos.
+    */
     val repositorioPelicula by lazy {
         RepositorioPelicula(miBBDD.peliculaDAO())
     }
 
+    /*
+    Creamos el repositorio de usuarios.
+
+    Igual que con las películas, este repositorio permite trabajar con usuarios:
+    login, registro, editar, borrar, buscar, etc.
+    */
     val repositorioUsuario by lazy {
         RepositorioUsuario(miBBDD.usuarioDAO())
     }
 
+    /*
+    Creamos el ViewModel principal de la aplicación.
+
+    Como AppViewModel necesita recibir dos repositorios por constructor,
+    Android no sabe crearlo solo.
+
+    Por eso usamos AppViewModelFactory, que se encarga de crear el ViewModel
+    pasándole repositorioPelicula y repositorioUsuario.
+    */
     val miViewModel: AppViewModel by viewModels {
         AppViewModelFactory(
             repositorioPelicula,
@@ -46,6 +84,13 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    /*
+    companion object sirve para crear constantes que pertenecen a la clase.
+
+    Aquí guardamos los nombres de las claves que usamos en SharedPreferences.
+
+    SharedPreferences se usa para recordar si el usuario ha iniciado sesión.
+    */
     companion object {
         const val PREFS_NAME = "datos_usuario"
         const val KEY_LOGEADO = "logeado"
@@ -57,24 +102,54 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Cargamos el layout principal de la Activity.
+        /*
+        Inflamos el layout principal.
+
+        ActivityMainBinding se genera automáticamente gracias a ViewBinding.
+        Nos permite acceder a los elementos del XML activity_main.xml.
+        */
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Configuramos la toolbar superior.
+        /*
+        Configuramos la toolbar superior de la aplicación.
+
+        binding.toolbar hace referencia al MaterialToolbar que tenemos en activity_main.xml.
+        */
         setSupportActionBar(binding.toolbar)
 
-        // Buscamos el NavHostFragment de forma segura.
-        // Este fragment es el contenedor donde se van mostrando las pantallas.
+        /*
+        Buscamos el NavHostFragment.
+
+        El NavHostFragment es el contenedor donde se van mostrando los fragments.
+
+        Por ejemplo:
+        - LoginFragment
+        - InicioFragment
+        - PerfilFragment
+        - UsuariosFragment
+
+        Todos se cargan dentro de este contenedor.
+        */
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
 
-        // Sacamos el NavController desde el NavHostFragment.
-        // El NavController sirve para navegar entre fragments.
+        /*
+        Sacamos el NavController.
+
+        El NavController es el encargado de movernos entre pantallas.
+        Es decir, controla la navegación entre fragments.
+        */
         val navController = navHostFragment.navController
 
-        // Aquí indicamos cuáles son las pantallas principales.
-        // En estas pantallas no aparece la flecha de volver arriba.
+        /*
+        Configuramos cuáles son las pantallas principales.
+
+        Estas pantallas forman parte del menú inferior.
+
+        En estas pantallas no se mostrará la flecha de volver en la toolbar,
+        porque se consideran pantallas principales.
+        */
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.inicioFragment,
@@ -84,27 +159,80 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-        // Unimos la toolbar con el sistema de navegación.
+        /*
+        Conectamos la toolbar superior con el NavController.
+
+        Esto permite que la toolbar sepa en qué pantalla estamos
+        y pueda mostrar el título o la flecha de volver cuando corresponda.
+        */
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        // Buscamos el menú inferior.
+        /*
+        Buscamos el menú inferior.
+
+        El BottomNavigationView es la barra inferior con opciones como:
+        - Inicio
+        - Añadir
+        - Usuarios
+        - Perfil
+        */
         val bottomNavigationView =
             findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
-        // Conectamos el menú inferior con el nav_graph.
-        // IMPORTANTE: los ids de menu_bottom.xml deben coincidir con los ids del nav_graph.xml.
+        /*
+        Conectamos el menú inferior con el NavController.
+
+        Esta línea es muy importante.
+
+        Gracias a esto, cuando pulsamos una opción del menú inferior,
+        Android navega automáticamente al fragment correspondiente.
+
+        IMPORTANTE:
+        Los ids de menu_bottom.xml deben coincidir con los ids del nav_graph.xml.
+
+        Ejemplo:
+        menu_bottom.xml  -> inicioFragment
+        nav_graph.xml    -> inicioFragment
+        */
         bottomNavigationView.setupWithNavController(navController)
 
-        // Inserta usuarios y películas iniciales si la base de datos está vacía.
-        // Por ejemplo: admin, usuario normal y películas iniciales.
+        /*
+        Insertamos datos iniciales.
+
+        Esta función mete usuarios y películas de prueba si la base de datos está vacía.
+
+        Por ejemplo:
+        - Usuario admin
+        - Usuario normal
+        - Películas iniciales
+        */
         miViewModel.insertarDatosIniciales()
 
-        // Carga la sesión guardada si el usuario ya había iniciado sesión antes.
+        /*
+        Cargamos la sesión guardada.
+
+        Si el usuario inició sesión antes y no cerró sesión,
+        la app intenta recuperar su usuario desde SharedPreferences.
+        */
         cargarSesionDesdeSharedPreferences()
 
-        // Cada vez que cambiamos de pantalla, decidimos si se ve o no el menú inferior.
+        /*
+        Este listener se ejecuta cada vez que cambiamos de pantalla.
+
+        Sirve para controlar cosas como:
+        - Ocultar el menú inferior en Login y Registro.
+        - Mostrar el menú inferior en el resto de pantallas.
+        - Actualizar si se ve o no la pestaña de usuarios.
+        - Actualizar el menú superior.
+        */
         navController.addOnDestinationChangedListener { _, destination, _ ->
 
+            /*
+            Si estamos en Login o Registro, ocultamos el menú inferior.
+
+            No tendría sentido mostrar Inicio, Perfil o Usuarios
+            si todavía no hemos iniciado sesión.
+            */
             bottomNavigationView.visibility =
                 if (
                     destination.id == R.id.loginFragment ||
@@ -115,11 +243,35 @@ class MainActivity : AppCompatActivity() {
                     View.VISIBLE
                 }
 
+            /*
+            Actualizamos el menú inferior.
+
+            Aquí se decide, por ejemplo, si la pestaña Usuarios se ve o no.
+            Solo se verá si el usuario es ADMIN.
+            */
             actualizarMenuInferior()
+
+            /*
+            Refrescamos el menú superior.
+
+            Esto sirve para que la opción "Desloguearse" aparezca o desaparezca
+            según haya usuario iniciado o no.
+            */
             invalidateOptionsMenu()
         }
     }
 
+    /*
+    Esta función guarda la sesión del usuario en SharedPreferences.
+
+    Se llama cuando el login es correcto.
+
+    Guardamos:
+    - Que está logueado.
+    - El id del usuario.
+    - El nombre de usuario.
+    - El rol.
+    */
     fun guardarSesionEnSharedPreferences(usuario: Usuario) {
         val datos = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
@@ -133,17 +285,36 @@ class MainActivity : AppCompatActivity() {
         editor.apply()
     }
 
+    /*
+    Esta función intenta recuperar una sesión guardada.
+
+    Si el usuario ya había iniciado sesión anteriormente,
+    buscamos su id en SharedPreferences.
+
+    Después buscamos ese usuario en la base de datos Room.
+    */
     private fun cargarSesionDesdeSharedPreferences() {
         val datos = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
         val logeado = datos.getBoolean(KEY_LOGEADO, false)
 
+        /*
+        Si logeado es true, significa que había una sesión guardada.
+        */
         if (logeado) {
             val usuarioId = datos.getInt(KEY_USUARIO_ID, -1)
 
+            /*
+            Si el id es distinto de -1, intentamos buscar el usuario en Room.
+            */
             if (usuarioId != -1) {
                 miViewModel.buscarUsuarioPorId(usuarioId) { usuarioEncontrado ->
 
+                    /*
+                    Si no encontramos el usuario, borramos la sesión.
+
+                    Esto puede pasar si el usuario fue eliminado de la base de datos.
+                    */
                     if (usuarioEncontrado == null) {
                         borrarSesionDeSharedPreferences()
                     }
@@ -152,6 +323,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /*
+    Esta función borra la sesión guardada en SharedPreferences.
+
+    Se usa cuando cerramos sesión o cuando la sesión guardada ya no es válida.
+    */
     fun borrarSesionDeSharedPreferences() {
         val datos = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
@@ -162,6 +338,14 @@ class MainActivity : AppCompatActivity() {
         editor.apply()
     }
 
+    /*
+    Esta función cierra sesión.
+
+    Hace tres cosas:
+    1. Borra SharedPreferences.
+    2. Limpia los datos del ViewModel.
+    3. Vuelve a la pantalla de Login.
+    */
     fun desloguearse() {
         borrarSesionDeSharedPreferences()
 
@@ -173,6 +357,9 @@ class MainActivity : AppCompatActivity() {
             Toast.LENGTH_SHORT
         ).show()
 
+        /*
+        Volvemos a obtener el NavController para navegar al Login.
+        */
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
 
@@ -181,56 +368,113 @@ class MainActivity : AppCompatActivity() {
         navController.navigate(R.id.loginFragment)
     }
 
+    /*
+    Creamos el menú superior.
+
+    Aquí cargamos menu_main.xml.
+
+    En tu app contiene la opción de desloguearse.
+    */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
+    /*
+    Esta función se ejecuta antes de mostrar el menú superior.
+
+    Sirve para decidir qué opciones se ven y cuáles no.
+    */
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
 
-        // La opción de desloguearse solo aparece si hay usuario iniciado.
+        /*
+        La opción "Desloguearse" solo se muestra si hay un usuario iniciado.
+
+        Si miViewModel.usuario es null, significa que no hay sesión activa.
+        */
         menu.findItem(R.id.action_desloguearse)?.isVisible =
             miViewModel.usuario != null
 
         return super.onPrepareOptionsMenu(menu)
     }
 
+    /*
+    Esta función detecta qué opción del menú superior ha pulsado el usuario.
+    */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         return when (item.itemId) {
 
+            /*
+            Si pulsa "Desloguearse", llamamos a la función desloguearse().
+            */
             R.id.action_desloguearse -> {
                 desloguearse()
                 true
             }
 
+            /*
+            Si pulsa otra cosa, dejamos que Android lo gestione normalmente.
+            */
             else -> super.onOptionsItemSelected(item)
         }
     }
 
+    /*
+    Esta función controla la flecha de volver de la toolbar.
+
+    Cuando estamos en una pantalla secundaria, como editar o detalle,
+    permite volver a la pantalla anterior.
+    */
     override fun onSupportNavigateUp(): Boolean {
 
-        /*Busco el contenedor de fragments.
-        Saco de ahí el NavController.*/
+        /*
+        Buscamos otra vez el NavHostFragment.
+        */
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
 
+        /*
+        Sacamos el NavController.
+        */
         val navController = navHostFragment.navController
 
-        /*El navcontroller es el que controla la navegación.*/
+        /*
+        Intentamos navegar hacia arriba.
+
+        Si navController.navigateUp() no puede hacerlo,
+        usamos el comportamiento normal de Android.
+        */
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
     }
 
+    /*
+    Esta función actualiza el menú inferior.
+
+    En concreto, controla si se ve o no la pestaña de Usuarios.
+    */
     private fun actualizarMenuInferior() {
 
-        /*Menú inferior, cuando pulse un botón, usa este navController para cambiar de pantalla.*/
-
+        /*
+        Buscamos el BottomNavigationView.
+        */
         val bottomNavigationView =
             findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(
                 R.id.bottomNavigationView
             )
 
+        /*
+        Buscamos la opción usuariosFragment del menú inferior.
+
+        Solo será visible si puedeGestionarUsuarios() devuelve true.
+
+        En tu ViewModel, puedeGestionarUsuarios() devuelve true solo si el usuario es ADMIN.
+
+        Resultado:
+        - ADMIN ve la pestaña Usuarios.
+        - NORMAL no ve la pestaña Usuarios.
+        */
         bottomNavigationView.menu.findItem(R.id.usuariosFragment)?.isVisible =
             miViewModel.puedeGestionarUsuarios()
     }

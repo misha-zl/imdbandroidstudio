@@ -91,11 +91,13 @@ class AnadirUsuarioFragment : Fragment() {
             return
         }
 
+        //si el password es menor de 4 caracteres muestra un mensaje de error
         if (password.length < 4) {
             Toast.makeText(requireContext(), "La contraseña debe tener al menos 4 caracteres", Toast.LENGTH_SHORT).show()
             return
         }
 
+        //Si el telefono es menor de 9 digitos o mayor de 9 digitos muestra un mensaje de error
         if (telefono.length != 9 || !telefono.all { it.isDigit() }) {
             Toast.makeText(requireContext(), "El teléfono debe tener 9 números", Toast.LENGTH_SHORT).show()
             return

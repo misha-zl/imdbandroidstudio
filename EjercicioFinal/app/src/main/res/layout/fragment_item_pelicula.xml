@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--Aqui se como se va a ser cada elemento de la lista-->
+<!--ImageView de la película
+TextView del nombre
+TextView del director
+TextView del año
+TextView de la crítica-->
+
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"

@@ -90,7 +90,14 @@ Cuando Room me mande películas, las guardo y las muestro.*/
     /*Coge esta lista de películas.
     Mándasela al AdaptadorPelicula.
     Cuando pulse una película, guárdala como seleccionada.
-    Después abre el detalle*/
+    Después abre el detalle
+
+        Pulso una película
+            ↓
+        La guardo como película seleccionada
+            ↓
+        Voy a la pantalla de detalle
+    */
     private fun mostrarPeliculas(lista: List<Pelicula>) {
 
         binding.rvPeliculas.adapter = AdaptadorPelicula(lista) { peliculaPulsada ->

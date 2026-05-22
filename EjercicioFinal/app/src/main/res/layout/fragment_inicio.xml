@@ -95,6 +95,8 @@
 
 
 
+<!--Aqui se muestra el espacio donde va a estar la lista -->
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPeliculas"

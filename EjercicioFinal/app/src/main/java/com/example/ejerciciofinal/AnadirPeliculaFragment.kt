@@ -72,6 +72,8 @@ class AnadirPeliculaFragment : Fragment() {
         val descripcion = binding.etAddDescripcion.text.toString().trim()
         val critica = binding.etAddCritica.text.toString().trim()
 
+
+        //Si alguno de los campos esta vacio muestra un mensaje de error
         if (
             nombre.isBlank() ||
             director.isBlank() ||
@@ -87,6 +89,7 @@ class AnadirPeliculaFragment : Fragment() {
             return
         }
 
+        //aniotexto lo convierte en int en caso de no ser un numero devuelve null
         val anio = anioTexto.toIntOrNull()
 
         if (anio == null) {

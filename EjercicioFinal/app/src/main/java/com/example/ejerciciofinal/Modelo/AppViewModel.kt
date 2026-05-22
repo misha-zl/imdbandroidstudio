@@ -51,6 +51,8 @@ class AppViewModel(
         return usuario != null
     }
 
+
+    //Si el usuario es admin es true else es false
     fun puedeEditarEliminarPelicula(): Boolean {
         return usuario?.rol == "ADMIN"
     }
@@ -82,10 +84,10 @@ class AppViewModel(
         telefono: String,
         onResultado: (Boolean, String) -> Unit
     ) = viewModelScope.launch {
-
+        //Se busca un usuario con el mismo nombre de usuario
         val usuarioExistente =
             repositorioUsuario.buscarUsuarioPorNombreUsuario(nombreUsuario)
-
+        //Si existe muestra un mensaje de error
         if (usuarioExistente != null) {
             onResultado(false, "Ya existe un usuario con ese nombre de usuario")
             return@launch
@@ -164,10 +166,10 @@ class AppViewModel(
         imagenPerfil: String,
         onResultado: (Boolean, String) -> Unit
     ) = viewModelScope.launch {
-
+        //Se busca un usuario con el mismo nombre de usuario
         val usuarioExistente =
             repositorioUsuario.buscarUsuarioPorNombreUsuario(nombreUsuario)
-
+        //Si existe muestra un mensaje de error
         if (usuarioExistente != null) {
             onResultado(false, "Ya existe un usuario con ese nombre de usuario")
             return@launch
@@ -194,14 +196,15 @@ class AppViewModel(
         onResultado: (Boolean, String) -> Unit
     ) = viewModelScope.launch {
 
+        //Se busca un usuario con el mismo nombre de usuario
         val usuarioExistente =
             repositorioUsuario.buscarUsuarioPorNombreUsuario(usuarioActualizado.nombreUsuario)
-
+        //Si existe muestra un mensaje de error
         if (usuarioExistente != null && usuarioExistente.id != usuarioActualizado.id) {
             onResultado(false, "Ya existe otro usuario con ese nombre de usuario")
             return@launch
         }
-
+        //Si no existe actualiza el usuario
         repositorioUsuario.actualizarUsuario(usuarioActualizado)
 
         if (usuario?.id == usuarioActualizado.id) {

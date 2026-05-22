@@ -19,10 +19,20 @@ class AdaptadorPelicula(
     private val onClickPelicula: (Pelicula) -> Unit
 ) : RecyclerView.Adapter<AdaptadorPelicula.ViewHolder>() {
 
+    /*El ViewHolder guarda las vistas de cada item.
+    tvNombrePelicula
+    tvDirectorPelicula
+    tvAnioPelicula
+    ivPosterPelicula
+
+     */
     inner class ViewHolder(
         val binding: FragmentItemPeliculaBinding
     ) : RecyclerView.ViewHolder(binding.root)
+
+
     /*crea tarjeta virtual usando item_pelicula.xml*/
+    /*Coge el XML fragment_item_pelicula.xml y crea una tarjeta vacía.*/
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -38,6 +48,10 @@ class AdaptadorPelicula(
 
     /*rellena la tarjeta con datos cogiendo la pelicula de la posicion actual y poner los datos en los TextView*/
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        /*position = 0 → Avatar
+        position = 1 → Forrest Gump
+        position = 2 → Pulp Fiction*/
+
         val pelicula = listaPeliculas[position]
 
         holder.binding.tvNombrePelicula.text = pelicula.nombre
@@ -45,6 +59,7 @@ class AdaptadorPelicula(
         holder.binding.tvAnioPelicula.text = "Año: ${pelicula.anio}"
         holder.binding.tvCriticaPelicula.text = pelicula.critica
 
+        //En caso de no haber imagen se pone la imagen por defecto
         if (pelicula.imagen.isNotBlank()) {
             try {
                 holder.binding.ivPosterPelicula.setImageURI(Uri.parse(pelicula.imagen))
@@ -55,6 +70,8 @@ class AdaptadorPelicula(
             holder.binding.ivPosterPelicula.setImageResource(R.drawable.no_foto)
         }
 
+        /*Cuando pulse esta película,
+ejecuta la acción que me han pasado desde el Fragment.*/
         holder.binding.itemPelicula.setOnClickListener {
             onClickPelicula(pelicula)
         }
