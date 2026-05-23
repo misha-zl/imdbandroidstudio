@@ -379,6 +379,7 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
+    //MENU SUPERIOR
 
     /*
     Esta función se ejecuta antes de mostrar el menú superior.
