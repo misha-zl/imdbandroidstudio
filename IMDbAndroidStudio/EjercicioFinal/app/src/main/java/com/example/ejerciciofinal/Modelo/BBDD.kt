@@ -12,7 +12,7 @@ import androidx.room.RoomDatabase
 /*La base de datos tiene 2 tablas usuarios y peliculas*/
 @Database(
     entities = [Pelicula::class, Usuario::class],
-    version = 3,
+    version = 4,
     exportSchema = false
 
 )

@@ -352,6 +352,19 @@ class MainActivity : AppCompatActivity() {
     3. Vuelve a la pantalla de Login.
     */
     fun desloguearse() {
+        /* ventana emergente para confirmar cerrar sesión
+
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Cerrar sesión")
+            .setMessage("¿Seguro que quieres cerrar sesión?")
+            .setPositiveButton("Sí") { _, _ ->
+                desloguearse()
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+
+        true*/
+
         borrarSesionDeSharedPreferences()
 
         miViewModel.cerrarSesion()
@@ -419,6 +432,15 @@ class MainActivity : AppCompatActivity() {
                 true
             }
 
+           /* R.id.action_acerca_de -> {
+                Toast.makeText(
+                    this,
+                    "IMDb Android - Proyecto Kotlin",
+                    Toast.LENGTH_LONG
+                ).show()
+                true
+            } */
+
             /*
             Si pulsa otra cosa, dejamos que Android lo gestione normalmente.
             */
@@ -483,6 +505,11 @@ class MainActivity : AppCompatActivity() {
         */
         bottomNavigationView.menu.findItem(R.id.usuariosFragment)?.isVisible =
             miViewModel.puedeGestionarUsuarios()
+
+        /*Se oculta añadir pelicula si no es admin
+
+        bottomNavigationView.menu.findItem(R.id.anadirPeliculaFragment)?.isVisible =
+            miViewModel.esAdmin() */
     }
 }
 

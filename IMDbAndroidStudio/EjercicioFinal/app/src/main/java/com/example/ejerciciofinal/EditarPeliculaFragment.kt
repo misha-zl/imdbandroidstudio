@@ -138,6 +138,7 @@ class EditarPeliculaFragment : Fragment() {
         val anioTexto = binding.etEditarAnio.text.toString().trim()
         val descripcion = binding.etEditarDescripcion.text.toString().trim()
         val critica = binding.etEditarCritica.text.toString().trim()
+       // val genero = binding.etAddGenero.text.toString().trim()
 
         if (
             nombre.isBlank() ||
@@ -145,6 +146,7 @@ class EditarPeliculaFragment : Fragment() {
             anioTexto.isBlank() ||
             descripcion.isBlank() ||
             critica.isBlank()
+            // || gener.isBlank()
         ) {
             Toast.makeText(
                 requireContext(),
@@ -172,7 +174,8 @@ class EditarPeliculaFragment : Fragment() {
             anio = anio,
             descripcion = descripcion,
             critica = critica,
-            imagen = imagenSeleccionada
+            imagen = imagenSeleccionada,
+            //genero= genero
         )
 
         (activity as MainActivity).miViewModel.seleccionarPelicula(peliculaEditada)

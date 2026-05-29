@@ -13,5 +13,8 @@ data class Pelicula(
     var anio: Int,
     var descripcion: String,
     var critica: String,
-    var imagen: String = ""
+    var imagen: String = "",
+    /* se aáde esta columna para poder buscar por genero*/
+    /*ve a fragment_anadir_pelicula.xml */
+    /*var genero: String = ""*/
 )

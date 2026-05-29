@@ -17,6 +17,12 @@ class InicioFragment : Fragment() {
     private var _binding: FragmentInicioBinding? = null
     private val binding get() = _binding!!
 
+
+
+
+
+
+
     // Aquí guardamos TODAS las películas que vienen de Room.
     // Esta lista no se toca, es la lista original.
     private var listaPeliculasCompleta: List<Pelicula> = emptyList()
@@ -65,6 +71,7 @@ Cuando Room me mande películas, las guardo y las muestro.*/
             aplicarFiltro(binding.etBuscarInicio.text.toString())
         }
     }
+
     private fun aplicarFiltro(textoBuscado: String) {
 
         val listaFiltrada = if (textoBuscado.isBlank()) {
@@ -73,8 +80,6 @@ Cuando Room me mande películas, las guardo y las muestro.*/
             listaPeliculasCompleta
 
         } else {
-
-
 
 
             // Si escribes algo, buscamos películas que contengan ese texto.
@@ -128,8 +133,6 @@ Cuando Room me mande películas, las guardo y las muestro.*/
             findNavController().navigate(R.id.action_inicioFragment_to_detallePeliculaFragment)
         }
     }
-
-
 
 
     private fun configurarBuscador() {

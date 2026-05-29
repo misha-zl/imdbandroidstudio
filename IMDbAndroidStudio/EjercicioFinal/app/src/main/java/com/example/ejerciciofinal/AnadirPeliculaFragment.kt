@@ -8,10 +8,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.example.ejerciciofinal.databinding.FragmentAnadirPeliculaBinding
 import com.example.ejerciciofinal.modelo.Pelicula
-import androidx.navigation.NavOptions
+
 
 class AnadirPeliculaFragment : Fragment() {
 
@@ -19,6 +20,8 @@ class AnadirPeliculaFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var imagenSeleccionada: String = ""
+
+    // val genero = binding.etAddGenero.text.toString().trim()
 
     private val seleccionarImagen = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -56,6 +59,23 @@ class AnadirPeliculaFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+        /* Si se quiere quitae el permiso al usuario de añadir peliculas
+
+        if (!(activity as MainActivity).miViewModel.esAdmin()) {
+            Toast.makeText(
+                requireContext(),
+                "Solo el administrador puede añadir películas",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            findNavController().navigate(R.id.inicioFragment)
+            return
+        }
+
+        */
+
+
         binding.btnSeleccionarImagenPelicula.setOnClickListener {
             seleccionarImagen.launch(arrayOf("image/*"))
         }
@@ -71,6 +91,7 @@ class AnadirPeliculaFragment : Fragment() {
         val anioTexto = binding.etAddAnio.text.toString().trim()
         val descripcion = binding.etAddDescripcion.text.toString().trim()
         val critica = binding.etAddCritica.text.toString().trim()
+        //val genero= binding.etAddGenero.text.toString().trim()
 
 
         //Si alguno de los campos esta vacio muestra un mensaje de error
@@ -80,6 +101,7 @@ class AnadirPeliculaFragment : Fragment() {
             anioTexto.isBlank() ||
             descripcion.isBlank() ||
             critica.isBlank()
+           // || genero.isBlank()
         ) {
             Toast.makeText(
                 requireContext(),
@@ -92,10 +114,14 @@ class AnadirPeliculaFragment : Fragment() {
         //aniotexto lo convierte en int en caso de no ser un numero devuelve null
         val anio = anioTexto.toIntOrNull()
 
+
+        //si se quiere meter un rango de años se puede hacer asi
+        //if (anio == null || anio < 1900 || anio > 2023) {
+
         if (anio == null) {
             Toast.makeText(
                 requireContext(),
-                "El año debe ser un número",
+                "El año debe ser un número entero entre 1900 y 2023",
                 Toast.LENGTH_SHORT
             ).show()
             return
@@ -107,7 +133,8 @@ class AnadirPeliculaFragment : Fragment() {
             anio = anio,
             descripcion = descripcion,
             critica = critica,
-            imagen = imagenSeleccionada
+            imagen = imagenSeleccionada,
+            //  genero = genero
         )
 
         (activity as MainActivity).miViewModel.insertarPelicula(pelicula)

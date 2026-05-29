@@ -66,6 +66,7 @@ class DetallePeliculaFragment : Fragment() {
         binding.tvDetalleAnio.text = "Año: ${pelicula.anio}"
         binding.tvDetalleDescripcion.text = pelicula.descripcion
         binding.tvDetalleCritica.text = pelicula.critica
+       // binding,tvDetalleGenero.text = pelicula.genero
     }
 
     private fun controlarBotonesAdmin() {

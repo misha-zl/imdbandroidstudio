@@ -58,6 +58,8 @@ class AdaptadorPelicula(
         holder.binding.tvDirectorPelicula.text = "Director: ${pelicula.director}"
         holder.binding.tvAnioPelicula.text = "Año: ${pelicula.anio}"
         holder.binding.tvCriticaPelicula.text = pelicula.critica
+      //  holder.binding.tvGeneroPelicula.text = pelicula.genero
+
 
         //En caso de no haber imagen se pone la imagen por defecto
         if (pelicula.imagen.isNotBlank()) {

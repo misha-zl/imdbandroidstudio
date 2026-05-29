@@ -76,6 +76,17 @@ TextView de la crítica-->
                 android:maxLines="2"
                 android:text="Crítica"
                 android:textColor="#000000"
+                android:textSize="13sp"/>
+              <!--  android:visibility="gone" -->
+
+            <TextView
+                android:id="@+id/tvGeneroPelicula"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:maxLines="2"
+                android:text="Genero"
+                android:textColor="#000000"
                 android:textSize="13sp" />
 
         </LinearLayout>

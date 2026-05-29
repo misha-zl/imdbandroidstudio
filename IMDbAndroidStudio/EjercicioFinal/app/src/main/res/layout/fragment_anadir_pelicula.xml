@@ -82,7 +82,17 @@
             android:gravity="top"
             android:inputType="textMultiLine"
             android:layout_marginBottom="24dp" />
-
+<!-- ###########################################################
+Si pide añadir pelicula ve a anadir pelicula fragment
+        <EditText
+            android:id="@+id/etAddGenero"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:hint="Genero"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:layout_marginBottom="24dp" />
+        -->
         <Button
             android:id="@+id/btnGuardarPelicula"
             android:layout_width="match_parent"
@@ -91,6 +101,8 @@
             android:textColor="#000000"
             android:textStyle="bold"
             android:backgroundTint="#F5C518" />
+
+        <!-- Cambio color texto android:textcolor="#000000"-->
 
     </LinearLayout>
 
