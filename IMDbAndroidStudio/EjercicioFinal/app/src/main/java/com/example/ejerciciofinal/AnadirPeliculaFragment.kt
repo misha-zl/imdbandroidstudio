@@ -21,6 +21,7 @@ class AnadirPeliculaFragment : Fragment() {
 
     private var imagenSeleccionada: String = ""
 
+    //AQUI si vienes de fragment_anadir_pelicula.xml
     // val genero = binding.etAddGenero.text.toString().trim()
 
     private val seleccionarImagen = registerForActivityResult(

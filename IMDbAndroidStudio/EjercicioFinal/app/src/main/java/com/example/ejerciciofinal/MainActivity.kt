@@ -431,16 +431,20 @@ class MainActivity : AppCompatActivity() {
                 desloguearse()
                 true
             }
+            /*
+             Si pulsa "Acerca de", mostramos un Toast con información de la app.
 
-           /* R.id.action_acerca_de -> {
+             Puedes personalizar el mensaje con tu nombre, el curso, etc.
+
+            R.id.action_acerca_de -> {
                 Toast.makeText(
                     this,
                     "IMDb Android - Proyecto Kotlin",
                     Toast.LENGTH_LONG
                 ).show()
                 true
-            } */
-
+            }
+                */
             /*
             Si pulsa otra cosa, dejamos que Android lo gestione normalmente.
             */

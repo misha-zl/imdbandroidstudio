@@ -113,6 +113,7 @@ class EditarPeliculaFragment : Fragment() {
         binding.etEditarAnio.setText(pelicula.anio.toString())
         binding.etEditarDescripcion.setText(pelicula.descripcion)
         binding.etEditarCritica.setText(pelicula.critica)
+        //binding.etEditarGenero.setText(pelicula.genero)
     }
 
     private fun configurarBotonGuardar() {
@@ -138,7 +139,7 @@ class EditarPeliculaFragment : Fragment() {
         val anioTexto = binding.etEditarAnio.text.toString().trim()
         val descripcion = binding.etEditarDescripcion.text.toString().trim()
         val critica = binding.etEditarCritica.text.toString().trim()
-       // val genero = binding.etAddGenero.text.toString().trim()
+       // val genero = binding.etEditarGenero.text.toString().trim()
 
         if (
             nombre.isBlank() ||
@@ -157,6 +158,10 @@ class EditarPeliculaFragment : Fragment() {
         }
 
         val anio = anioTexto.toIntOrNull()
+
+
+        //si se quiere meter un rango de años se puede hacer asi
+        //if (anio == null || anio < 1900 || anio > 2023) {
 
         if (anio == null) {
             Toast.makeText(

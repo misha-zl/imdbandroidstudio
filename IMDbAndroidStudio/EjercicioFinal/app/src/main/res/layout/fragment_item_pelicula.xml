@@ -77,8 +77,10 @@ TextView de la crítica-->
                 android:text="Crítica"
                 android:textColor="#000000"
                 android:textSize="13sp"/>
-              <!--  android:visibility="gone" -->
+              <!--  Si se quiere que no se vea android:visibility="gone" -->
 
+            <!--  se aáde esta columna para poder buscar por genero
+            AdapatadorPelicula siguiente archivo
             <TextView
                 android:id="@+id/tvGeneroPelicula"
                 android:layout_width="match_parent"
@@ -88,6 +90,10 @@ TextView de la crítica-->
                 android:text="Genero"
                 android:textColor="#000000"
                 android:textSize="13sp" />
+
+            -->
+
+
 
         </LinearLayout>
 

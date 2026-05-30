@@ -95,7 +95,9 @@
             android:textColor="#000000"
             android:textSize="15sp"
             android:layout_marginBottom="28dp" />
-<!--
+
+
+<!-- detalle pelicula fragment.kt
         <TextView
             android:id="@+id/tvDetalleGenero"
             android:layout_width="match_parent"

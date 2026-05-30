@@ -58,6 +58,7 @@ class AdaptadorPelicula(
         holder.binding.tvDirectorPelicula.text = "Director: ${pelicula.director}"
         holder.binding.tvAnioPelicula.text = "Año: ${pelicula.anio}"
         holder.binding.tvCriticaPelicula.text = pelicula.critica
+
       //  holder.binding.tvGeneroPelicula.text = pelicula.genero
 
 
@@ -77,6 +78,19 @@ ejecuta la acción que me han pasado desde el Fragment.*/
         holder.binding.itemPelicula.setOnClickListener {
             onClickPelicula(pelicula)
         }
+
+        /* / Qué hace: cambia visualmente la tarjeta según el año.
+        if (pelicula.anio >= 2000) {
+            holder.binding.itemPelicula.setCardBackgroundColor(
+                android.graphics.Color.parseColor("#FFF8D6")
+            )
+        } else {
+            holder.binding.itemPelicula.setCardBackgroundColor(
+                android.graphics.Color.WHITE
+            )
+            }
+            */
+
     }
     /*devuelve el tamaño de la lista asi se muestra la cantidad de peliculas que hay*/
     override fun getItemCount(): Int {

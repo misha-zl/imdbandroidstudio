@@ -108,14 +108,22 @@
             android:paddingStart="12dp"
             android:paddingEnd="12dp" />
 
-        <EditText
-            android:id="@+id/etAddGenero"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_marginBottom="24dp"
-            android:gravity="top"
-            android:hint="Genero"
-            android:inputType="textMultiLine" />
+        <!-- editar pelicula fragment.kt
+
+   <EditText
+
+   ir a editarPeliculaFragment.kt
+       android:id="@+id/etEditarGenero"
+       android:layout_width="match_parent"
+               android:layout_height="100dp"
+               android:layout_marginBottom="24dp"
+               android:backgroundTint="#DDDDDD"
+               android:gravity="top"
+               android:hint="Crítica"
+               android:inputType="textMultiLine"
+               android:paddingStart="12dp"
+               android:paddingEnd="12dp" />
+           -->
 
 
         <Button

@@ -1769,3 +1769,1248 @@ override fun onOptionsItemSelected(item: MenuItem): Boolean {
 }
 
 */
+
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+
+
+
+/*
+# Apuntes prácticos — Modificaciones rápidas para la demo del proyecto IMDb
+
+Proyecto Android/Kotlin: `com.example.ejerciciofinal`
+
+Estos apuntes están pensados para una demostración práctica de 20–30 minutos. La idea es saber **qué archivo tocar**, **en qué punto**, **qué código cambiar** y **qué hace cada cambio**.
+
+---
+
+## Regla rápida para saber dónde tocar
+
+```text
+Dato nuevo                → Pelicula.kt / Usuario.kt + BBDD.kt
+Consulta a base de datos  → DAO
+Paso intermedio           → Repositorio
+Lógica de la app          → AppViewModel
+Pantalla                  → Fragment + XML
+Lista                     → Adapter + item XML
+Menú                      → menu_main.xml / menu_bottom.xml + MainActivity
+Navegación                → nav_graph.xml
+Sesión                    → SharedPreferences en MainActivity
+```
+
+---
+
+# 1. Validación nueva en añadir / editar película
+
+## 1A. Validar año entre 1900 y 2026
+
+### Archivo: `AnadirPeliculaFragment.kt`
+
+Ve a la función:
+
+```kotlin
+private fun guardarPelicula()
+```
+
+Busca esta parte:
+
+```kotlin
+if (anio == null) {
+    ```
+
+    Cámbiala por:
+
+    ```kotlin
+// Archivo: AnadirPeliculaFragment.kt
+// Punto: dentro de guardarPelicula(), después de convertir anioTexto con toIntOrNull()
+// Qué hace: evita guardar años inválidos o textos que no sean número.
+
+    if (anio == null || anio < 1900 || anio > 2026) {
+        Toast.makeText(
+            requireContext(),
+            "El año debe estar entre 1900 y 2026",
+            Toast.LENGTH_SHORT
+        ).show()
+        return
+    }
+    ```
+
+    ---
+
+    ### Archivo: `EditarPeliculaFragment.kt`
+
+    Ve a la función:
+
+    ```kotlin
+    private fun guardarCambios()
+    ```
+
+    Busca:
+
+    ```kotlin
+    if (anio == null) {
+        ```
+
+        Cámbialo por:
+
+        ```kotlin
+// Archivo: EditarPeliculaFragment.kt
+// Punto: dentro de guardarCambios(), después de val anio = anioTexto.toIntOrNull()
+// Qué hace: impide editar una película con un año absurdo.
+
+        if (anio == null || anio < 1900 || anio > 2026) {
+            Toast.makeText(
+                requireContext(),
+                "El año debe estar entre 1900 y 2026",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        ```
+
+        ---
+
+        ## 1B. Validar crítica mínima
+
+        ### Archivo: `AnadirPeliculaFragment.kt`
+
+        Dentro de `guardarPelicula()`, después de comprobar que los campos no están vacíos, añade:
+
+        ```kotlin
+// Archivo: AnadirPeliculaFragment.kt
+// Punto: después de comprobar que los campos no están vacíos
+// Qué hace: evita guardar críticas demasiado cortas.
+
+        if (critica.length < 10) {
+            Toast.makeText(
+                requireContext(),
+                "La crítica debe tener al menos 10 caracteres",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        ```
+
+        ### Archivo: `EditarPeliculaFragment.kt`
+
+        Haz lo mismo dentro de:
+
+        ```kotlin
+        private fun guardarCambios()
+        ```
+
+        Añade:
+
+        ```kotlin
+// Archivo: EditarPeliculaFragment.kt
+// Punto: después de comprobar que los campos no están vacíos
+// Qué hace: evita editar una película dejando una crítica demasiado corta.
+
+        if (critica.length < 10) {
+            Toast.makeText(
+                requireContext(),
+                "La crítica debe tener al menos 10 caracteres",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        ```
+
+        ---
+
+        # 2. Añadir campo `genero`
+
+        Este cambio toca Room. Cuando se cambia una entidad, hay que tocar también la versión de la base de datos.
+
+        ---
+
+        ## Archivo: `Pelicula.kt`
+
+        Añade el campo:
+
+        ```kotlin
+        var genero: String = ""
+        ```
+
+        La clase quedaría así:
+
+        ```kotlin
+// Archivo: Pelicula.kt
+// Punto: dentro del data class Pelicula
+// Qué hace: añade una nueva columna llamada genero a la tabla peliculas.
+
+        package com.example.ejerciciofinal.modelo
+
+        import androidx.room.Entity
+                import androidx.room.PrimaryKey
+
+                @Entity(tableName = "peliculas")
+                data class Pelicula(
+                    @PrimaryKey(autoGenerate = true)
+                    var id: Int = 0,
+                    var nombre: String,
+                    var director: String,
+                    var anio: Int,
+                    var descripcion: String,
+                    var critica: String,
+                    var imagen: String = "",
+                    var genero: String = ""
+                )
+        ```
+
+        ---
+
+        ## Archivo: `BBDD.kt`
+
+        Cambia la versión de Room.
+
+        Si ahora tienes:
+
+        ```kotlin
+        version = 4
+        ```
+
+        Cámbialo a:
+
+        ```kotlin
+// Archivo: BBDD.kt
+// Punto: anotación @Database
+// Qué hace: avisa a Room de que ha cambiado la estructura de la tabla.
+
+        version = 5
+        ```
+
+        Quedaría:
+
+        ```kotlin
+        @Database(
+            entities = [Pelicula::class, Usuario::class],
+            version = 5,
+            exportSchema = false
+        )
+        ```
+
+        Como tienes:
+
+        ```kotlin
+        .fallbackToDestructiveMigration(true)
+        ```
+
+        Room puede borrar y reconstruir la base de datos durante el desarrollo.
+
+        ---
+
+        # 3. Mostrar género en tarjeta y detalle
+
+                ---
+
+        ## 3A. Añadir género al formulario de añadir película
+
+        ### Archivo: `fragment_anadir_pelicula.xml`
+
+        Ve donde están estos campos:
+
+        ```text
+        etAddNombre
+        etAddDirector
+        etAddAnio
+        ```
+
+        Debajo de `etAddAnio`, añade:
+
+        ```xml
+        <!-- Archivo: fragment_anadir_pelicula.xml -->
+        <!-- Punto: debajo del campo etAddAnio -->
+        <!-- Qué hace: permite escribir el género al añadir película -->
+
+        <EditText
+        android:id="@+id/etAddGenero"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Género"
+        android:inputType="text"
+        android:layout_marginBottom="12dp" />
+        ```
+
+        ---
+
+        ### Archivo: `AnadirPeliculaFragment.kt`
+
+        Dentro de `guardarPelicula()`, donde lees los campos, añade:
+
+        ```kotlin
+// Archivo: AnadirPeliculaFragment.kt
+// Punto: dentro de guardarPelicula(), junto al resto de campos
+// Qué hace: recoge el género escrito en el formulario.
+
+        val genero = binding.etAddGenero.text.toString().trim()
+        ```
+
+        La zona quedaría así:
+
+        ```kotlin
+        val nombre = binding.etAddNombre.text.toString().trim()
+        val director = binding.etAddDirector.text.toString().trim()
+        val anioTexto = binding.etAddAnio.text.toString().trim()
+        val genero = binding.etAddGenero.text.toString().trim()
+        val descripcion = binding.etAddDescripcion.text.toString().trim()
+        val critica = binding.etAddCritica.text.toString().trim()
+        ```
+
+        En la validación de campos vacíos, añade `genero.isBlank()`:
+
+        ```kotlin
+// Archivo: AnadirPeliculaFragment.kt
+// Punto: validación de campos vacíos
+// Qué hace: obliga a rellenar también el género.
+
+        if (
+            nombre.isBlank() ||
+            director.isBlank() ||
+            anioTexto.isBlank() ||
+            genero.isBlank() ||
+            descripcion.isBlank() ||
+            critica.isBlank()
+        ) {
+            Toast.makeText(
+                requireContext(),
+                "Rellena todos los campos",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        ```
+
+        Al crear la película, añade `genero = genero`:
+
+        ```kotlin
+// Archivo: AnadirPeliculaFragment.kt
+// Punto: creación del objeto Pelicula
+// Qué hace: guarda el género dentro del objeto que va a Room.
+
+        val pelicula = Pelicula(
+            nombre = nombre,
+            director = director,
+            anio = anio,
+            descripcion = descripcion,
+            critica = critica,
+            imagen = imagenSeleccionada,
+            genero = genero
+        )
+        ```
+
+        ---
+
+        ## 3B. Mostrar género en detalle
+
+        ### Archivo: `fragment_detalle_pelicula.xml`
+
+        Debajo del `TextView` del año:
+
+        ```xml
+        <TextView
+        android:id="@+id/tvDetalleAnio"
+        ```
+
+        añade:
+
+        ```xml
+        <!-- Archivo: fragment_detalle_pelicula.xml -->
+        <!-- Punto: debajo del TextView tvDetalleAnio -->
+        <!-- Qué hace: muestra el género en la pantalla de detalle -->
+
+        <TextView
+        android:id="@+id/tvDetalleGenero"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Género"
+        android:textColor="#777777"
+        android:textSize="16sp"
+        android:layout_marginBottom="20dp" />
+        ```
+
+        ---
+
+        ### Archivo: `DetallePeliculaFragment.kt`
+
+        Dentro de `cargarDatosPelicula()`, junto a:
+
+        ```kotlin
+        binding.tvDetalleAnio.text = "Año: ${pelicula.anio}"
+        ```
+
+        añade:
+
+        ```kotlin
+// Archivo: DetallePeliculaFragment.kt
+// Punto: dentro de cargarDatosPelicula()
+// Qué hace: rellena el TextView del género con el dato de la película seleccionada.
+
+        binding.tvDetalleGenero.text = "Género: ${pelicula.genero}"
+        ```
+
+        ---
+
+        ## 3C. Mostrar género en tarjeta del RecyclerView
+
+        ### Archivo: `fragment_item_pelicula.xml`
+
+        Debajo de `tvAnioPelicula`, añade:
+
+        ```xml
+        <!-- Archivo: fragment_item_pelicula.xml -->
+        <!-- Punto: debajo de tvAnioPelicula -->
+        <!-- Qué hace: añade una línea de género en cada tarjeta del RecyclerView -->
+
+        <TextView
+        android:id="@+id/tvGeneroPelicula"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Género"
+        android:textColor="#777777"
+        android:textSize="14sp" />
+        ```
+
+        ---
+
+        ### Archivo: `AdaptadorPelicula.kt`
+
+        Dentro de `onBindViewHolder`, debajo de:
+
+        ```kotlin
+        holder.binding.tvAnioPelicula.text = "Año: ${pelicula.anio}"
+        ```
+
+        añade:
+
+        ```kotlin
+// Archivo: AdaptadorPelicula.kt
+// Punto: dentro de onBindViewHolder()
+// Qué hace: pone el género en cada tarjeta de película.
+
+        holder.binding.tvGeneroPelicula.text = "Género: ${pelicula.genero}"
+        ```
+
+        ---
+
+        ## 3D. Editar género
+
+        ### Archivo: `fragment_editar_pelicula.xml`
+
+        Debajo de `etEditarAnio`, añade:
+
+        ```xml
+        <!-- Archivo: fragment_editar_pelicula.xml -->
+        <!-- Punto: debajo de etEditarAnio -->
+        <!-- Qué hace: permite modificar el género al editar película -->
+
+        <EditText
+        android:id="@+id/etEditarGenero"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Género"
+        android:inputType="text"
+        android:backgroundTint="#DDDDDD"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:layout_marginBottom="12dp" />
+        ```
+
+        ---
+
+        ### Archivo: `EditarPeliculaFragment.kt`
+
+        En `cargarDatos()` añade:
+
+        ```kotlin
+// Archivo: EditarPeliculaFragment.kt
+// Punto: dentro de cargarDatos()
+// Qué hace: al abrir editar, carga el género actual en el campo.
+
+        binding.etEditarGenero.setText(pelicula.genero)
+        ```
+
+        En `guardarCambios()` añade:
+
+        ```kotlin
+// Archivo: EditarPeliculaFragment.kt
+// Punto: dentro de guardarCambios(), junto al resto de campos
+// Qué hace: lee el género escrito al editar.
+
+        val genero = binding.etEditarGenero.text.toString().trim()
+        ```
+
+        En la validación de campos vacíos, añade:
+
+        ```kotlin
+        genero.isBlank() ||
+        ```
+
+        Al crear `peliculaEditada`, añade `genero = genero`:
+
+        ```kotlin
+// Archivo: EditarPeliculaFragment.kt
+// Punto: creación de peliculaEditada
+// Qué hace: guarda el género editado sin perder el id de la película.
+
+        val peliculaEditada = Pelicula(
+            id = pelicula.id,
+            nombre = nombre,
+            director = director,
+            anio = anio,
+            descripcion = descripcion,
+            critica = critica,
+            imagen = imagenSeleccionada,
+            genero = genero
+        )
+        ```
+
+        ---
+
+        # 4. Ocultar añadir película si no es admin
+
+        ---
+
+        ## 4A. Bloquear pantalla
+
+        ### Archivo: `AnadirPeliculaFragment.kt`
+
+        En `onViewCreated()`, al principio, añade o descomenta:
+
+        ```kotlin
+// Archivo: AnadirPeliculaFragment.kt
+// Punto: al principio de onViewCreated()
+// Qué hace: si el usuario no es ADMIN, no le deja entrar a añadir película.
+
+        if (!(activity as MainActivity).miViewModel.esAdmin()) {
+            Toast.makeText(
+                requireContext(),
+                "Solo el administrador puede añadir películas",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            findNavController().navigate(R.id.inicioFragment)
+            return
+        }
+        ```
+
+        ---
+
+        ## 4B. Ocultar pestaña del menú inferior
+
+        ### Archivo: `MainActivity.kt`
+
+        Ve a:
+
+        ```kotlin
+        private fun actualizarMenuInferior()
+        ```
+
+        Debajo de donde ocultas `usuariosFragment`, añade:
+
+        ```kotlin
+// Archivo: MainActivity.kt
+// Punto: dentro de actualizarMenuInferior()
+// Qué hace: oculta la pestaña Añadir si el usuario no es administrador.
+
+        bottomNavigationView.menu.findItem(R.id.anadirPeliculaFragment)?.isVisible =
+            miViewModel.esAdmin()
+        ```
+
+        ---
+
+        # 5. Restaurar sesión con SharedPreferences
+
+        ### Archivo: `MainActivity.kt`
+
+        Ve a:
+
+        ```kotlin
+        private fun cargarSesionDesdeSharedPreferences(navController: NavController)
+        ```
+
+        Busca la parte donde se comprueba `usuarioEncontrado`.
+
+        Déjalo así:
+
+        ```kotlin
+// Archivo: MainActivity.kt
+// Punto: dentro de cargarSesionDesdeSharedPreferences()
+// Qué hace: si había sesión guardada, recupera el usuario y entra directamente a Inicio.
+
+        if (usuarioEncontrado == null) {
+            borrarSesionDeSharedPreferences()
+        } else {
+            miViewModel.usuario = usuarioEncontrado
+            navController.navigate(R.id.inicioFragment)
+        }
+        ```
+
+        Esto sirve para que, si cierras y abres la app, entre directamente si el usuario ya estaba logueado.
+
+        ---
+
+        # 6. Añadir opción “Acerca de” al menú superior
+
+        ---
+
+        ## Archivo: `menu_main.xml`
+
+        Ahora tienes `action_desloguearse`. Añade debajo:
+
+        ```xml
+        <!-- Archivo: menu_main.xml -->
+        <!-- Punto: dentro de <menu> -->
+        <!-- Qué hace: añade una opción nueva en los tres puntitos superiores -->
+
+        <item
+        android:id="@+id/action_acerca_de"
+        android:title="Acerca de"
+        app:showAsAction="never" />
+        ```
+
+        ---
+
+        ## Archivo: `MainActivity.kt`
+
+        En `onOptionsItemSelected`, añade un nuevo caso:
+
+        ```kotlin
+// Archivo: MainActivity.kt
+// Punto: dentro de onOptionsItemSelected()
+// Qué hace: cuando se pulsa "Acerca de", muestra un mensaje informativo.
+
+        R.id.action_acerca_de -> {
+            Toast.makeText(
+                this,
+                "IMDb Android - Proyecto Kotlin con Room, ViewModel y RecyclerView",
+                Toast.LENGTH_LONG
+            ).show()
+            true
+        }
+        ```
+
+        El `when` quedaría parecido a esto:
+
+        ```kotlin
+        return when (item.itemId) {
+
+            R.id.action_desloguearse -> {
+                desloguearse()
+                true
+            }
+
+            R.id.action_acerca_de -> {
+                Toast.makeText(
+                    this,
+                    "IMDb Android - Proyecto Kotlin con Room, ViewModel y RecyclerView",
+                    Toast.LENGTH_LONG
+                ).show()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+        ```
+
+        ---
+
+        # 7. Cambiar diseño del item de película
+
+                ---
+
+        ## 7A. Quitar crítica de la tarjeta
+
+        ### Archivo: `AdaptadorPelicula.kt`
+
+        Arriba añade:
+
+        ```kotlin
+        import android.view.View
+        ```
+
+        En `onBindViewHolder`, busca:
+
+        ```kotlin
+        holder.binding.tvCriticaPelicula.text = pelicula.critica
+        ```
+
+        Añade debajo:
+
+        ```kotlin
+// Archivo: AdaptadorPelicula.kt
+// Punto: dentro de onBindViewHolder()
+// Qué hace: oculta la crítica en la tarjeta, pero sigue existiendo en detalle.
+
+        holder.binding.tvCriticaPelicula.visibility = View.GONE
+        ```
+
+        ---
+
+        ## 7B. Mostrar año junto al nombre
+
+        ### Archivo: `AdaptadorPelicula.kt`
+
+        Cambia:
+
+        ```kotlin
+        holder.binding.tvNombrePelicula.text = pelicula.nombre
+        ```
+
+        por:
+
+        ```kotlin
+// Archivo: AdaptadorPelicula.kt
+// Punto: dentro de onBindViewHolder()
+// Qué hace: muestra el año al lado del título.
+
+        holder.binding.tvNombrePelicula.text = "${pelicula.nombre} (${pelicula.anio})"
+        ```
+
+        ---
+
+        ## 7C. Cambiar color de fondo de la tarjeta
+
+        ### Archivo: `AdaptadorPelicula.kt`
+
+        Dentro de `onBindViewHolder`, añade:
+
+        ```kotlin
+// Archivo: AdaptadorPelicula.kt
+// Punto: dentro de onBindViewHolder()
+// Qué hace: cambia visualmente la tarjeta según el año.
+
+        if (pelicula.anio >= 2000) {
+            holder.binding.itemPelicula.setCardBackgroundColor(
+                android.graphics.Color.parseColor("#FFF8D6")
+            )
+        } else {
+            holder.binding.itemPelicula.setCardBackgroundColor(
+                android.graphics.Color.WHITE
+            )
+        }
+        ```
+
+        ---
+
+        # 8. Añadir mensaje “No hay resultados”
+
+        ---
+
+        ## Archivo: `fragment_inicio.xml`
+
+        Debajo de `tvSeccionPeliculas` y antes del `RecyclerView`, añade:
+
+        ```xml
+        <!-- Archivo: fragment_inicio.xml -->
+        <!-- Punto: debajo del TextView tvSeccionPeliculas -->
+        <!-- Qué hace: muestra un mensaje cuando el buscador no encuentra películas -->
+
+        <TextView
+        android:id="@+id/tvSinResultados"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No hay resultados"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tvSeccionPeliculas"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+        ```
+
+        No lo pongas dentro de `barraSuperiorInicio`, porque se metería en la cabecera amarilla.
+
+        ---
+
+        ## Archivo: `InicioFragment.kt`
+
+        En:
+
+        ```kotlin
+        private fun mostrarPeliculas(lista: List<Pelicula>)
+        ```
+
+        déjalo así:
+
+        ```kotlin
+// Archivo: InicioFragment.kt
+// Punto: dentro de mostrarPeliculas()
+// Qué hace: si la lista filtrada está vacía, oculta el RecyclerView y muestra mensaje.
+
+        private fun mostrarPeliculas(lista: List<Pelicula>) {
+
+            if (lista.isEmpty()) {
+                binding.tvSinResultados.visibility = View.VISIBLE
+                binding.rvPeliculas.visibility = View.GONE
+            } else {
+                binding.tvSinResultados.visibility = View.GONE
+                binding.rvPeliculas.visibility = View.VISIBLE
+            }
+
+            binding.rvPeliculas.adapter = AdaptadorPelicula(lista) { peliculaPulsada ->
+
+                (activity as MainActivity).miViewModel.seleccionarPelicula(peliculaPulsada)
+
+                findNavController().navigate(R.id.action_inicioFragment_to_detallePeliculaFragment)
+            }
+        }
+        ```
+
+        Asegúrate de tener este import:
+
+        ```kotlin
+        import android.view.View
+        ```
+
+        ---
+
+        # 9. Buscar usuarios por nombre completo
+
+        ### Archivo: `UsuariosFragment.kt`
+
+        Ve a:
+
+        ```kotlin
+        private fun aplicarFiltro(textoBuscado: String)
+        ```
+
+        Busca la parte donde filtras por `nombreUsuario` y `telefono`.
+
+        Déjalo así:
+
+        ```kotlin
+// Archivo: UsuariosFragment.kt
+// Punto: dentro de aplicarFiltro()
+// Qué hace: permite buscar por usuario, teléfono o nombre completo.
+
+        usuario.nombreUsuario.contains(
+            texto,
+            ignoreCase = true
+        ) ||
+                usuario.telefono.contains(
+                    texto,
+                    ignoreCase = true
+                ) ||
+                usuario.nombre.contains(
+                    texto,
+                    ignoreCase = true
+                )
+        ```
+
+        ---
+
+        # 10. Ordenar películas por año desde DAO
+
+        ### Archivo: `PeliculaDAO.kt`
+
+        Ahora seguramente tienes:
+
+        ```kotlin
+        @Query("SELECT * FROM peliculas ORDER BY nombre ASC")
+        fun mostrarPeliculas(): Flow<List<Pelicula>>
+        ```
+
+        Cámbialo por:
+
+        ```kotlin
+// Archivo: PeliculaDAO.kt
+// Punto: consulta mostrarPeliculas()
+// Qué hace: muestra primero las películas más nuevas.
+
+        @Query("SELECT * FROM peliculas ORDER BY anio DESC")
+        fun mostrarPeliculas(): Flow<List<Pelicula>>
+        ```
+
+        Si quieres las más antiguas primero:
+
+        ```kotlin
+        @Query("SELECT * FROM peliculas ORDER BY anio ASC")
+        fun mostrarPeliculas(): Flow<List<Pelicula>>
+        ```
+
+        ---
+
+        # 11. Evitar películas duplicadas
+
+        Este cambio toca DAO, Repositorio, ViewModel y Fragment.
+
+        ---
+
+        ## 11A. DAO
+
+        ### Archivo: `PeliculaDAO.kt`
+
+        Añade esta consulta dentro de `interface PeliculaDAO`:
+
+        ```kotlin
+// Archivo: PeliculaDAO.kt
+// Punto: dentro de interface PeliculaDAO
+// Qué hace: busca si ya existe una película con ese nombre.
+
+        @Query("SELECT * FROM peliculas WHERE LOWER(nombre) = LOWER(:nombre) LIMIT 1")
+        suspend fun buscarPeliculaPorNombre(nombre: String): Pelicula?
+        ```
+
+        ---
+
+        ## 11B. Repositorio
+
+        ### Archivo: `RepositorioPelicula.kt`
+
+        Añade dentro de `class RepositorioPelicula`:
+
+        ```kotlin
+// Archivo: RepositorioPelicula.kt
+// Punto: dentro de class RepositorioPelicula
+// Qué hace: permite al ViewModel preguntar si ya existe una película.
+
+        @WorkerThread
+        suspend fun buscarPeliculaPorNombre(nombre: String): Pelicula? {
+            return peliculaDAO.buscarPeliculaPorNombre(nombre)
+        }
+        ```
+
+        ---
+
+        ## 11C. ViewModel
+
+        ### Archivo: `AppViewModel.kt`
+
+        Añade esta función dentro de `class AppViewModel`:
+
+        ```kotlin
+// Archivo: AppViewModel.kt
+// Punto: dentro de class AppViewModel
+// Qué hace: antes de insertar, comprueba si ya existe una película con el mismo nombre.
+
+        fun insertarPeliculaSinDuplicar(
+            pelicula: Pelicula,
+            onResultado: (Boolean, String) -> Unit
+        ) = viewModelScope.launch {
+
+            val existente = repositorioPelicula.buscarPeliculaPorNombre(pelicula.nombre)
+
+            if (existente != null) {
+                onResultado(false, "Ya existe una película con ese nombre")
+                return@launch
+            }
+
+            repositorioPelicula.insertarPelicula(pelicula)
+            onResultado(true, "Película añadida correctamente")
+        }
+        ```
+
+        ---
+
+        ## 11D. Fragment
+
+        ### Archivo: `AnadirPeliculaFragment.kt`
+
+        Busca:
+
+        ```kotlin
+        (activity as MainActivity).miViewModel.insertarPelicula(pelicula)
+
+        Toast.makeText(
+            requireContext(),
+            "Película añadida correctamente",
+            Toast.LENGTH_SHORT
+        ).show()
+
+        limpiarFormulario()
+        ```
+
+        Cámbialo por:
+
+        ```kotlin
+// Archivo: AnadirPeliculaFragment.kt
+// Punto: después de crear val pelicula = Pelicula(...)
+// Qué hace: llama al ViewModel para insertar solo si no existe otra con el mismo nombre.
+
+        (activity as MainActivity).miViewModel.insertarPeliculaSinDuplicar(pelicula) { correcto, mensaje ->
+
+            Toast.makeText(
+                requireContext(),
+                mensaje,
+                Toast.LENGTH_SHORT
+            ).show()
+
+            if (correcto) {
+                limpiarFormulario()
+
+                val opciones = NavOptions.Builder()
+                    .setPopUpTo(R.id.inicioFragment, false)
+                    .setLaunchSingleTop(true)
+                    .build()
+
+                findNavController().popBackStack()
+                findNavController().navigate(R.id.inicioFragment, null, opciones)
+            }
+        }
+        ```
+
+        Importante: elimina o comenta la navegación antigua para que no se ejecute dos veces.
+
+        ---
+
+        # 12. Añadir favoritos
+
+                Este cambio toca entidad, BBDD, detalle y tarjeta.
+
+        ---
+
+        ## 12A. Añadir campo favorito
+
+        ### Archivo: `Pelicula.kt`
+
+        Añade:
+
+        ```kotlin
+// Archivo: Pelicula.kt
+// Punto: dentro del data class Pelicula
+// Qué hace: permite marcar una película como favorita o no.
+
+        var favorita: Boolean = false
+        ```
+
+        Si ya añadiste `genero`, quedaría así:
+
+        ```kotlin
+        @Entity(tableName = "peliculas")
+        data class Pelicula(
+            @PrimaryKey(autoGenerate = true)
+            var id: Int = 0,
+            var nombre: String,
+            var director: String,
+            var anio: Int,
+            var descripcion: String,
+            var critica: String,
+            var imagen: String = "",
+            var genero: String = "",
+            var favorita: Boolean = false
+        )
+        ```
+
+        ---
+
+        ## 12B. Subir versión de Room
+
+        ### Archivo: `BBDD.kt`
+
+        Si ya estabas en `version = 5` por género, sube a:
+
+        ```kotlin
+// Archivo: BBDD.kt
+// Punto: @Database
+// Qué hace: Room detecta que hay una nueva columna favorita.
+
+        version = 6
+        ```
+
+        Si haces género y favorita a la vez desde `version = 4`, puedes subir directamente a `version = 5`.
+
+        ---
+
+        ## 12C. Botón favorito en detalle
+
+        ### Archivo: `fragment_detalle_pelicula.xml`
+
+        Antes del botón editar, añade:
+
+        ```xml
+        <!-- Archivo: fragment_detalle_pelicula.xml -->
+        <!-- Punto: antes de btnEditarPelicula -->
+        <!-- Qué hace: botón para marcar o desmarcar una película favorita -->
+
+        <Button
+        android:id="@+id/btnFavorita"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Marcar como favorita"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:backgroundTint="#F5C518"
+        android:layout_marginBottom="12dp" />
+        ```
+
+        ---
+
+        ## 12D. Lógica en detalle
+
+        ### Archivo: `DetallePeliculaFragment.kt`
+
+        En `configurarBotones()`, añade:
+
+        ```kotlin
+// Archivo: DetallePeliculaFragment.kt
+// Punto: dentro de configurarBotones()
+// Qué hace: al pulsar el botón, cambia favorita de true a false o de false a true.
+
+        binding.btnFavorita.setOnClickListener {
+            cambiarFavorita()
+        }
+        ```
+
+        Ahora crea esta función:
+
+        ```kotlin
+// Archivo: DetallePeliculaFragment.kt
+// Punto: debajo de configurarBotones()
+// Qué hace: actualiza la película seleccionada y la guarda en Room.
+
+        private fun cambiarFavorita() {
+            val pelicula = (activity as MainActivity).miViewModel.peliculaSeleccionada
+
+            if (pelicula == null) {
+                Toast.makeText(
+                    requireContext(),
+                    "No hay película seleccionada",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+
+            val peliculaActualizada = pelicula.copy(
+                favorita = !pelicula.favorita
+            )
+
+            (activity as MainActivity).miViewModel.seleccionarPelicula(peliculaActualizada)
+            (activity as MainActivity).miViewModel.actualizarPelicula(peliculaActualizada)
+
+            Toast.makeText(
+                requireContext(),
+                "Favorito actualizado",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            actualizarTextoFavorita(peliculaActualizada)
+        }
+        ```
+
+        Añade también:
+
+        ```kotlin
+// Archivo: DetallePeliculaFragment.kt
+// Punto: debajo de cambiarFavorita()
+// Qué hace: cambia el texto del botón según si es favorita o no.
+
+        private fun actualizarTextoFavorita(pelicula: Pelicula) {
+            binding.btnFavorita.text =
+                if (pelicula.favorita) {
+                    "Quitar de favoritas"
+                } else {
+                    "Marcar como favorita"
+                }
+        }
+        ```
+
+        Arriba importa:
+
+        ```kotlin
+        import com.example.ejerciciofinal.modelo.Pelicula
+        ```
+
+        Dentro de `cargarDatosPelicula()`, al final, añade:
+
+        ```kotlin
+// Archivo: DetallePeliculaFragment.kt
+// Punto: final de cargarDatosPelicula()
+// Qué hace: pone el texto correcto del botón al abrir el detalle.
+
+        actualizarTextoFavorita(pelicula)
+        ```
+
+        ---
+
+        ## 12E. Mostrar estrella en la tarjeta
+
+        ### Archivo: `AdaptadorPelicula.kt`
+
+        Cambia:
+
+        ```kotlin
+        holder.binding.tvNombrePelicula.text = pelicula.nombre
+        ```
+
+        por:
+
+        ```kotlin
+// Archivo: AdaptadorPelicula.kt
+// Punto: dentro de onBindViewHolder()
+// Qué hace: si la película es favorita, muestra una estrella en el título.
+
+        holder.binding.tvNombrePelicula.text =
+            if (pelicula.favorita) {
+                "⭐ ${pelicula.nombre}"
+            } else {
+                pelicula.nombre
+            }
+        ```
+
+        ---
+
+        # Resumen final
+
+        ```text
+        1. Validación nueva
+        → AnadirPeliculaFragment.kt / EditarPeliculaFragment.kt
+
+        2. Añadir género
+        → Pelicula.kt + BBDD.kt
+
+        3. Mostrar género
+        → XML de añadir, editar, detalle, item + Fragment/Adapter
+
+        4. Ocultar añadir si no es admin
+        → AnadirPeliculaFragment.kt + MainActivity.kt
+
+        5. Restaurar sesión
+        → MainActivity.kt
+
+        6. Opción Acerca de
+        → menu_main.xml + MainActivity.kt
+
+        7. Cambiar diseño item película
+        → fragment_item_pelicula.xml + AdaptadorPelicula.kt
+
+        8. No hay resultados
+        → fragment_inicio.xml + InicioFragment.kt
+
+        9. Buscar usuarios por nombre completo
+        → UsuariosFragment.kt
+
+        10. Ordenar por año
+        → PeliculaDAO.kt
+
+        11. Evitar duplicados
+        → PeliculaDAO.kt + RepositorioPelicula.kt + AppViewModel.kt + AnadirPeliculaFragment.kt
+
+        12. Favoritos
+        → Pelicula.kt + BBDD.kt + fragment_detalle_pelicula.xml + DetallePeliculaFragment.kt + AdaptadorPelicula.kt
+        ```
+
+        ---
+
+        # Frase para explicar en la demo
+
+        ```text
+        Cuando quiero añadir una funcionalidad, primero miro si es un dato nuevo, una consulta, una lógica o un cambio visual.
+        Si es un dato nuevo, voy a la entidad y subo la versión de Room.
+        Si es una consulta, voy al DAO.
+        Si es lógica, la pongo en el ViewModel.
+        Si es pantalla, cambio el XML y el Fragment.
+        Si es una lista, cambio el Adapter y el XML del item.
+        ```
+*/

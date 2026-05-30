@@ -53,6 +53,30 @@ class InicioFragment : Fragment() {
             binding.tvInicio.text = "Bienvenido"
         }
     }
+
+    /*
+    Qué hace: si la lista filtrada está vacía, oculta el RecyclerView y muestra mensaje.
+
+    private fun mostrarPeliculas(lista: List<Pelicula>) {
+
+        if (lista.isEmpty()) {
+            binding.tvSinResultados.visibility = View.VISIBLE
+            binding.rvPeliculas.visibility = View.GONE
+        } else {
+            binding.tvSinResultados.visibility = View.GONE
+            binding.rvPeliculas.visibility = View.VISIBLE
+        }
+
+        binding.rvPeliculas.adapter = AdaptadorPelicula(lista) { peliculaPulsada ->
+
+            (activity as MainActivity).miViewModel.seleccionarPelicula(peliculaPulsada)
+
+            findNavController().navigate(R.id.action_inicioFragment_to_detallePeliculaFragment)
+        }
+    }
+
+    */
+
     /*Estoy mirando la lista de películas.
 Cuando Room me mande películas, las guardo y las muestro.*/
 
