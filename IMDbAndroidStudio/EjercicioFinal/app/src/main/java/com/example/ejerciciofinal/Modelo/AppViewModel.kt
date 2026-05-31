@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 /*View model guarda datos importantes de la app*/
 /*las listas vienen de ROOM
@@ -69,10 +70,9 @@ class AppViewModel(
         repositorioPelicula.insertarPelicula(pelicula)
     }
 
-    fun actualizarPelicula(pelicula: Pelicula) = viewModelScope.launch {
+    fun actualizarPelicula(pelicula: Pelicula) = viewModelScope.launch(Dispatchers.IO) {
         repositorioPelicula.actualizarPelicula(pelicula)
     }
-
     fun borrarPelicula(pelicula: Pelicula) = viewModelScope.launch {
         repositorioPelicula.borrarPelicula(pelicula)
     }

@@ -14,7 +14,8 @@ data class Pelicula(
     var descripcion: String,
     var critica: String,
     var imagen: String = "",
-    /* se aáde esta columna para poder buscar por genero*/
+    /* se aáde esta columna para poder buscar por genero o tener favoritos */
     /*ve a fragment_anadir_pelicula.xml,fragment_editar_pelicula.xml,fragmen_item_pelicula.xml */
-    /*var genero: String = ""*/
+    /*var genero: String = ""
+    var favorita: Boolean = false*/
 )

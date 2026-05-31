@@ -55,6 +55,15 @@ class AdaptadorPelicula(
         val pelicula = listaPeliculas[position]
 
         holder.binding.tvNombrePelicula.text = pelicula.nombre
+       /*
+       holder.binding.tvNombrePelicula.text =
+            if (pelicula.favorita) {
+                "⭐ ${pelicula.nombre} "
+            } else {
+                "${pelicula.nombre} "
+            }
+
+            */
         holder.binding.tvDirectorPelicula.text = "Director: ${pelicula.director}"
         holder.binding.tvAnioPelicula.text = "Año: ${pelicula.anio}"
         holder.binding.tvCriticaPelicula.text = pelicula.critica

@@ -10,11 +10,15 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.ejerciciofinal.databinding.FragmentDetallePeliculaBinding
+import com.example.ejerciciofinal.modelo.Pelicula
 
 class DetallePeliculaFragment : Fragment() {
 
     private var _binding: FragmentDetallePeliculaBinding? = null
     private val binding get() = _binding!!
+
+    private var peliculaActual: Pelicula? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,6 +44,8 @@ class DetallePeliculaFragment : Fragment() {
     private fun cargarDatosPelicula() {
         val pelicula = (activity as MainActivity).miViewModel.peliculaSeleccionada
 
+        peliculaActual = pelicula
+
         if (pelicula == null) {
             Toast.makeText(
                 requireContext(),
@@ -50,6 +56,7 @@ class DetallePeliculaFragment : Fragment() {
             findNavController().navigate(R.id.inicioFragment)
             return
         }
+
 
         if (pelicula.imagen.isNotBlank()) {
             try {
@@ -66,7 +73,9 @@ class DetallePeliculaFragment : Fragment() {
         binding.tvDetalleAnio.text = "Año: ${pelicula.anio}"
         binding.tvDetalleDescripcion.text = pelicula.descripcion
         binding.tvDetalleCritica.text = pelicula.critica
-       // binding,tvDetalleGenero.text = pelicula.genero
+        // binding,tvDetalleGenero.text = pelicula.genero
+
+       // actualizarTextoFavorita(pelicula)
     }
 
     private fun controlarBotonesAdmin() {
@@ -90,6 +99,10 @@ class DetallePeliculaFragment : Fragment() {
         binding.btnEliminarPelicula.setOnClickListener {
             confirmarEliminarPelicula()
         }
+
+      /*  binding.btnFavorita.setOnClickListener {
+            cambiarFavorita()
+        }*/
     }
 
     private fun confirmarEliminarPelicula() {
@@ -123,6 +136,36 @@ class DetallePeliculaFragment : Fragment() {
             .setNegativeButton("Cancelar", null)
             .show()
     }
+
+/*
+    private fun cambiarFavorita() {
+        val pelicula = peliculaActual ?: return
+        val peliculaActualizada = pelicula.copy(favorita = !pelicula.favorita)
+
+        peliculaActual = peliculaActualizada
+
+
+        (activity as MainActivity).miViewModel.seleccionarPelicula(peliculaActualizada)
+        (activity as MainActivity).miViewModel.actualizarPelicula(peliculaActualizada)
+
+        actualizarTextoFavorita(peliculaActualizada)
+
+
+        Toast.makeText(requireContext(), "Favorita actualizada", Toast.LENGTH_SHORT).show()
+
+
+    }
+
+    private fun actualizarTextoFavorita(pelicula: Pelicula) {
+        binding.btnFavorita.text =
+            if (pelicula.favorita) {
+                "Quitar de favoritas"
+            } else {
+                "Marcar como favorita"
+            }
+    } */
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()

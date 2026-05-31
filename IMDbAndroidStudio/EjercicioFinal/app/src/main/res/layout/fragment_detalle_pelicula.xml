@@ -127,6 +127,17 @@
             android:textStyle="bold"
             android:backgroundTint="#F50000" />
 
+       <!-- Boton de agregar a favoritos
+        <Button
+    android:id="@+id/btnFavorita"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Marcar como favorita"
+    android:backgroundTint="#F5C518"
+    android:textColor="#000000"
+    android:textStyle="bold"
+    android:layout_marginTop="12dp" /> -->
+
     </LinearLayout>
 
 </ScrollView>
