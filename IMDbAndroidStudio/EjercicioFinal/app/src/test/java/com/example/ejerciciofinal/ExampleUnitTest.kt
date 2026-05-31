@@ -3014,3 +3014,899 @@ if (anio == null) {
         Si es una lista, cambio el Adapter y el XML del item.
         ```
 */
+
+/*/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+
+Te los dejo aquí directamente, sin generar fichero.
+
+APUNTES — COSAS QUE PUEDO AÑADIR A MI APP IMDb
+
+Estos apuntes son para practicar cambios que se puedan hacer en 20-30 minutos y poder explicarlos bien en clase o en una defensa práctica.
+
+La idea es saber:
+
+Qué quiero añadir
+Qué archivos tengo que tocar
+Qué código puede hacer falta
+Por qué se hace así
+Cómo lo explico
+1. Regla rápida: ¿dónde tengo que tocar?
+
+Antes de tocar código, piensa esto:
+
+Si añado un dato nuevo       → Pelicula.kt / Usuario.kt + BBDD.kt
+Si añado una consulta        → DAO
+Si paso datos entre capas    → Repositorio
+Si añado lógica              → AppViewModel
+Si cambio una pantalla       → Fragment + XML
+Si cambio una lista          → Adapter + item XML
+Si cambio navegación         → nav_graph.xml
+Si cambio menú inferior      → menu_bottom.xml + MainActivity.kt
+Si cambio permisos           → AppViewModel + Fragment/MainActivity
+
+Frase importante:
+
+El Fragment no debe hablar directamente con Room.
+El Fragment llama al ViewModel.
+El ViewModel llama al Repositorio.
+El Repositorio llama al DAO.
+El DAO trabaja con Room.
+2. Añadir favoritas a las películas
+Qué añado
+
+Permitir que una película se pueda marcar como favorita.
+
+Ejemplo:
+
+Avatar → favorita
+Titanic → no favorita
+Archivos que tocaría
+Pelicula.kt
+BBDD.kt
+DetallePeliculaFragment.kt
+fragment_detalle_pelicula.xml
+AdaptadorPelicula.kt
+InicioFragment.kt
+fragment_inicio.xml
+Paso 1: añadir campo en Pelicula.kt
+var favorita: Boolean = false
+
+Ejemplo:
+
+@Entity(tableName = "peliculas")
+data class Pelicula(
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0,
+
+    var nombre: String,
+    var director: String,
+    var anio: Int,
+    var descripcion: String,
+    var critica: String,
+    var imagen: String = "",
+
+    var favorita: Boolean = false
+)
+Paso 2: subir versión en BBDD.kt
+
+Si antes tienes:
+
+version = 4
+
+lo cambias a:
+
+version = 5
+
+Porque has cambiado la tabla peliculas.
+
+Paso 3: añadir botón en detalle
+
+En fragment_detalle_pelicula.xml:
+
+<Button
+    android:id="@+id/btnFavorita"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:text="Marcar como favorita"
+    android:textColor="#000000"
+    android:textStyle="bold"
+    android:backgroundTint="#F5C518"
+    android:layout_marginBottom="12dp" />
+Paso 4: lógica en DetallePeliculaFragment.kt
+private fun cambiarFavorita() {
+    val pelicula = (activity as MainActivity).miViewModel.peliculaSeleccionada ?: return
+
+    val peliculaActualizada = pelicula.copy(
+        favorita = !pelicula.favorita
+    )
+
+    (activity as MainActivity).miViewModel.seleccionarPelicula(peliculaActualizada)
+    (activity as MainActivity).miViewModel.actualizarPelicula(peliculaActualizada)
+
+    actualizarTextoFavorita(peliculaActualizada)
+
+    Toast.makeText(requireContext(), "Favorita actualizada", Toast.LENGTH_SHORT).show()
+}
+
+Y esta función:
+
+private fun actualizarTextoFavorita(pelicula: Pelicula) {
+    binding.btnFavorita.text =
+        if (pelicula.favorita) {
+            "Quitar de favoritas"
+        } else {
+            "Marcar como favorita"
+        }
+}
+
+En configurarBotones():
+
+binding.btnFavorita.setOnClickListener {
+    cambiarFavorita()
+}
+Paso 5: mostrar estrella en el RecyclerView
+
+En AdaptadorPelicula.kt:
+
+holder.binding.tvNombrePelicula.text =
+    if (pelicula.favorita) {
+        "⭐ ${pelicula.nombre}"
+    } else {
+        pelicula.nombre
+    }
+Cómo lo explico
+He añadido una funcionalidad de favoritas.
+Para eso he añadido un campo Boolean en la entidad Pelicula.
+Desde el detalle cambio ese valor con copy, actualizo la película en Room mediante el ViewModel y luego muestro una estrella en el RecyclerView si la película es favorita.
+3. Añadir género a las películas
+Qué añado
+
+Un nuevo campo para guardar el género:
+
+Acción
+Drama
+Comedia
+Ciencia ficción
+Terror
+Animación
+Archivos que tocaría
+Pelicula.kt
+BBDD.kt
+fragment_anadir_pelicula.xml
+AnadirPeliculaFragment.kt
+fragment_editar_pelicula.xml
+EditarPeliculaFragment.kt
+fragment_detalle_pelicula.xml
+DetallePeliculaFragment.kt
+fragment_item_pelicula.xml
+AdaptadorPelicula.kt
+Paso 1: Pelicula.kt
+var genero: String = ""
+
+Ejemplo:
+
+data class Pelicula(
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0,
+    var nombre: String,
+    var director: String,
+    var anio: Int,
+    var descripcion: String,
+    var critica: String,
+    var imagen: String = "",
+    var genero: String = ""
+)
+Paso 2: BBDD.kt
+
+Subes la versión:
+
+version = 5
+Paso 3: añadir campo en formulario de añadir
+
+En fragment_anadir_pelicula.xml:
+
+<EditText
+    android:id="@+id/etAddGenero"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:hint="Género"
+    android:inputType="text"
+    android:layout_marginBottom="12dp" />
+Paso 4: leer género en AnadirPeliculaFragment.kt
+val genero = binding.etAddGenero.text.toString().trim()
+
+En la validación:
+
+if (
+    nombre.isBlank() ||
+    director.isBlank() ||
+    anioTexto.isBlank() ||
+    genero.isBlank() ||
+    descripcion.isBlank() ||
+    critica.isBlank()
+) {
+    Toast.makeText(requireContext(), "Rellena todos los campos", Toast.LENGTH_SHORT).show()
+    return
+}
+
+Al crear la película:
+
+val pelicula = Pelicula(
+    nombre = nombre,
+    director = director,
+    anio = anio,
+    descripcion = descripcion,
+    critica = critica,
+    imagen = imagenSeleccionada,
+    genero = genero
+)
+Cómo lo explico
+He añadido un dato nuevo a la película: el género.
+Como Pelicula es una entidad de Room, al añadir un campo nuevo cambia la tabla.
+Por eso subo la versión de la base de datos en BBDD.kt.
+Después añado el campo en los formularios y lo muestro en detalle y en el RecyclerView.
+4. Añadir puntuación a las películas
+Qué añado
+
+Una nota para cada película, por ejemplo de 0 a 10.
+
+Avatar → 8
+Titanic → 9
+Joker → 7
+Archivos que tocaría
+Pelicula.kt
+BBDD.kt
+fragment_anadir_pelicula.xml
+AnadirPeliculaFragment.kt
+fragment_editar_pelicula.xml
+EditarPeliculaFragment.kt
+fragment_detalle_pelicula.xml
+DetallePeliculaFragment.kt
+AdaptadorPelicula.kt
+En Pelicula.kt
+var puntuacion: Int = 0
+Validación
+
+En añadir o editar:
+
+val puntuacionTexto = binding.etAddPuntuacion.text.toString().trim()
+val puntuacion = puntuacionTexto.toIntOrNull()
+
+if (puntuacion == null || puntuacion < 0 || puntuacion > 10) {
+    Toast.makeText(
+        requireContext(),
+        "La puntuación debe estar entre 0 y 10",
+        Toast.LENGTH_SHORT
+    ).show()
+    return
+}
+Cómo lo explico
+He añadido una puntuación a cada película.
+Es un campo Int dentro de la entidad Pelicula.
+Valido que esté entre 0 y 10 para evitar datos incorrectos.
+Después lo guardo en Room y lo muestro en la tarjeta o en el detalle.
+5. Añadir filtro por género
+Qué añado
+
+Un botón o spinner para filtrar películas por género.
+
+Ejemplo:
+
+Ver solo acción
+Ver solo drama
+Ver solo ciencia ficción
+Archivos que tocaría
+fragment_inicio.xml
+InicioFragment.kt
+Forma sencilla con botones
+
+En fragment_inicio.xml:
+
+<Button
+    android:id="@+id/btnAccion"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Ver acción" />
+
+<Button
+    android:id="@+id/btnDrama"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Ver drama" />
+
+En InicioFragment.kt:
+
+binding.btnAccion.setOnClickListener {
+    val listaAccion = listaPeliculasCompleta.filter { pelicula ->
+        pelicula.genero.equals("Acción", ignoreCase = true)
+    }
+
+    mostrarPeliculas(listaAccion)
+}
+Cómo lo explico
+Uso la lista completa de películas que ya tengo cargada desde el ViewModel.
+Cuando pulso el botón, filtro esa lista por el campo género y mando el resultado al RecyclerView.
+6. Añadir ordenar por año
+Qué añado
+
+Un botón para ordenar las películas por año.
+
+Archivos que tocaría
+fragment_inicio.xml
+InicioFragment.kt
+XML
+<Button
+    android:id="@+id/btnOrdenarAnio"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Ordenar por año" />
+Kotlin
+binding.btnOrdenarAnio.setOnClickListener {
+    val ordenadas = listaPeliculasCompleta.sortedByDescending { pelicula ->
+        pelicula.anio
+    }
+
+    mostrarPeliculas(ordenadas)
+}
+Cómo lo explico
+Ordeno la lista en memoria usando sortedByDescending.
+No necesito consultar de nuevo Room porque ya tengo todas las películas cargadas en listaPeliculasCompleta.
+7. Añadir contador de películas
+Qué añado
+
+Mostrar cuántas películas hay.
+
+Ejemplo:
+
+Películas: 6
+Archivos que tocaría
+fragment_inicio.xml
+InicioFragment.kt
+XML
+<TextView
+    android:id="@+id/tvContadorPeliculas"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Películas: 0"
+    android:textSize="16sp"
+    android:textStyle="bold" />
+Kotlin
+
+Dentro de mostrarPeliculas():
+
+binding.tvContadorPeliculas.text = "Películas: ${lista.size}"
+Cómo lo explico
+Cada vez que muestro una lista en el RecyclerView, actualizo también un TextView con el tamaño de esa lista.
+Así el usuario sabe cuántas películas está viendo.
+8. Añadir mensaje “No hay resultados”
+Qué añado
+
+Cuando el buscador no encuentra nada, aparece un mensaje.
+
+Archivos que tocaría
+fragment_inicio.xml
+InicioFragment.kt
+XML
+<TextView
+    android:id="@+id/tvSinResultados"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="No hay resultados"
+    android:textSize="18sp"
+    android:textStyle="bold"
+    android:visibility="gone" />
+Kotlin
+private fun mostrarPeliculas(lista: List<Pelicula>) {
+
+    if (lista.isEmpty()) {
+        binding.tvSinResultados.visibility = View.VISIBLE
+        binding.rvPeliculas.visibility = View.GONE
+    } else {
+        binding.tvSinResultados.visibility = View.GONE
+        binding.rvPeliculas.visibility = View.VISIBLE
+    }
+
+    binding.rvPeliculas.adapter = AdaptadorPelicula(lista) { pelicula ->
+        (activity as MainActivity).miViewModel.seleccionarPelicula(pelicula)
+        findNavController().navigate(R.id.action_inicioFragment_to_detallePeliculaFragment)
+    }
+}
+Cómo lo explico
+Compruebo si la lista está vacía.
+Si está vacía, oculto el RecyclerView y muestro un mensaje.
+Si tiene datos, muestro el RecyclerView.
+9. Añadir evitar películas duplicadas
+Qué añado
+
+Evitar guardar dos películas con el mismo nombre.
+
+Archivos que tocaría
+PeliculaDAO.kt
+RepositorioPelicula.kt
+AppViewModel.kt
+AnadirPeliculaFragment.kt
+DAO
+@Query("SELECT * FROM peliculas WHERE LOWER(nombre) = LOWER(:nombre) LIMIT 1")
+suspend fun buscarPeliculaPorNombre(nombre: String): Pelicula?
+Repositorio
+suspend fun buscarPeliculaPorNombre(nombre: String): Pelicula? {
+    return peliculaDAO.buscarPeliculaPorNombre(nombre)
+}
+ViewModel
+fun insertarPelicula(
+    pelicula: Pelicula,
+    onResultado: (Boolean, String) -> Unit
+) = viewModelScope.launch(Dispatchers.IO) {
+
+    val existente = repositorioPelicula.buscarPeliculaPorNombre(pelicula.nombre)
+
+    if (existente != null) {
+        withContext(Dispatchers.Main) {
+            onResultado(false, "Ya existe una película con ese nombre")
+        }
+        return@launch
+    }
+
+    repositorioPelicula.insertarPelicula(pelicula)
+
+    withContext(Dispatchers.Main) {
+        onResultado(true, "Película añadida correctamente")
+    }
+}
+Fragment
+(activity as MainActivity).miViewModel.insertarPelicula(pelicula) { correcto, mensaje ->
+
+    Toast.makeText(requireContext(), mensaje, Toast.LENGTH_SHORT).show()
+
+    if (correcto) {
+        findNavController().navigate(R.id.action_anadirPeliculaFragment_to_inicioFragment)
+    }
+}
+Cómo lo explico
+Antes de insertar una película, el ViewModel consulta en Room si ya existe una película con el mismo nombre.
+Si existe, no la inserta y devuelve un mensaje.
+Si no existe, la guarda normalmente.
+10. Añadir datos iniciales
+Qué añado
+
+Que la app cree películas de prueba al arrancar si la base de datos está vacía.
+
+Archivos que tocaría
+PeliculaDAO.kt
+RepositorioPelicula.kt
+AppViewModel.kt
+MainActivity.kt
+DAO
+@Query("SELECT COUNT(*) FROM peliculas")
+suspend fun contarPeliculas(): Int
+
+@Insert
+suspend fun insertarPeliculas(peliculas: List<Pelicula>)
+Repositorio
+suspend fun contarPeliculas(): Int {
+    return peliculaDAO.contarPeliculas()
+}
+
+suspend fun insertarPeliculas(peliculas: List<Pelicula>) {
+    peliculaDAO.insertarPeliculas(peliculas)
+}
+ViewModel
+fun insertarDatosIniciales() = viewModelScope.launch(Dispatchers.IO) {
+
+    val cantidad = repositorioPelicula.contarPeliculas()
+
+    if (cantidad > 0) {
+        return@launch
+    }
+
+    val peliculasIniciales = listOf(
+        Pelicula(
+            nombre = "Avatar",
+            director = "James Cameron",
+            anio = 2009,
+            descripcion = "Un marine viaja al planeta Pandora.",
+            critica = "Película visualmente espectacular.",
+            imagen = ""
+        ),
+        Pelicula(
+            nombre = "Titanic",
+            director = "James Cameron",
+            anio = 1997,
+            descripcion = "Historia de amor durante el hundimiento del Titanic.",
+            critica = "Drama romántico muy conocido.",
+            imagen = ""
+        )
+    )
+
+    repositorioPelicula.insertarPeliculas(peliculasIniciales)
+}
+MainActivity
+
+Dentro de onCreate():
+
+miViewModel.insertarDatosIniciales()
+Cómo lo explico
+Al arrancar la app compruebo cuántas películas hay en Room.
+Si hay 0, inserto una lista de películas iniciales.
+Si ya hay películas, no hago nada para no duplicarlas.
+11. Añadir búsqueda de usuarios por nombre completo
+Qué añado
+
+Que el buscador de usuarios busque también por nombre real.
+
+Archivos que tocaría
+UsuariosFragment.kt
+Código
+val listaFiltrada = listaUsuariosCompleta.filter { usuario ->
+
+    usuario.nombre.contains(textoBuscado, ignoreCase = true) ||
+    usuario.nombreUsuario.contains(textoBuscado, ignoreCase = true) ||
+    usuario.telefono.contains(textoBuscado, ignoreCase = true)
+}
+Cómo lo explico
+Antes el buscador solo miraba el nombre de usuario y el teléfono.
+Ahora también comprueba el nombre real del usuario.
+Así es más fácil encontrar usuarios en la lista.
+12. Añadir confirmación al cerrar sesión
+Qué añado
+
+Antes de cerrar sesión, preguntar si está seguro.
+
+Archivos que tocaría
+PerfilFragment.kt
+Código
+binding.btnDesloguearsePerfil.setOnClickListener {
+
+    AlertDialog.Builder(requireContext())
+        .setTitle("Cerrar sesión")
+        .setMessage("¿Seguro que quieres cerrar sesión?")
+        .setPositiveButton("Sí") { _, _ ->
+            (activity as MainActivity).desloguearse()
+        }
+        .setNegativeButton("Cancelar", null)
+        .show()
+}
+Cómo lo explico
+He añadido un AlertDialog para confirmar el cierre de sesión.
+Así evito que el usuario cierre sesión por error.
+13. Añadir protección extra en pantallas de admin
+Qué añado
+
+Aunque ocultes la pestaña de usuarios, también proteges el Fragment.
+
+Archivos que tocaría
+UsuariosFragment.kt
+AnadirUsuarioFragment.kt
+EditarUsuarioFragment.kt
+Código
+if (!(activity as MainActivity).miViewModel.puedeGestionarUsuarios()) {
+    Toast.makeText(
+        requireContext(),
+        "No tienes permiso para gestionar usuarios",
+        Toast.LENGTH_SHORT
+    ).show()
+
+    findNavController().navigate(R.id.perfilFragment)
+    return
+}
+Cómo lo explico
+No basta con ocultar la pestaña.
+También protejo la pantalla por si un usuario normal llega de alguna forma.
+Si no tiene permiso, lo mando al perfil.
+14. Añadir opción “Acerca de”
+Qué añado
+
+Una opción en los tres puntitos superiores con información de la app.
+
+Archivos que tocaría
+menu_main.xml
+MainActivity.kt
+menu_main.xml
+<item
+    android:id="@+id/action_acerca_de"
+    android:title="Acerca de"
+    app:showAsAction="never" />
+MainActivity.kt
+R.id.action_acerca_de -> {
+    Toast.makeText(
+        this,
+        "IMDb App creada con Kotlin, Room, ViewModel y RecyclerView",
+        Toast.LENGTH_LONG
+    ).show()
+    true
+}
+Cómo lo explico
+El menú superior se infla en MainActivity con onCreateOptionsMenu.
+Luego uso onOptionsItemSelected para saber qué opción ha pulsado el usuario.
+Si pulsa Acerca de, muestro un Toast con información de la app.
+15. Añadir pestaña de estadísticas
+Qué añado
+
+Una pantalla nueva con datos como:
+
+Total de películas
+Total de usuarios
+Películas favoritas
+Películas por género
+Archivos que tocaría
+EstadisticasFragment.kt
+fragment_estadisticas.xml
+nav_graph.xml
+menu_bottom.xml
+AppViewModel.kt
+Qué haría
+
+Crear un nuevo Fragment:
+
+EstadisticasFragment
+
+Añadirlo al nav_graph.xml.
+
+Añadirlo al menú inferior:
+
+<item
+    android:id="@+id/estadisticasFragment"
+    android:icon="@drawable/ic_stats"
+    android:title="Stats" />
+Cómo lo explico
+He añadido una pantalla nueva de estadísticas.
+Para que funcione con el menú inferior, el id del item del menu_bottom tiene que coincidir con el id del fragment en nav_graph.
+MainActivity conecta el BottomNavigationView con el NavController usando setupWithNavController.
+
+Esta es más larga. Mejor practicarla solo si tienes tiempo.
+
+16. Añadir imagen por defecto más controlada
+Qué añado
+
+Si una película no tiene imagen o falla la URI, pongo una imagen por defecto.
+
+Archivos que tocaría
+AdaptadorPelicula.kt
+DetallePeliculaFragment.kt
+EditarPeliculaFragment.kt
+PerfilFragment.kt
+Código típico
+try {
+    if (pelicula.imagen.isNotBlank()) {
+        holder.binding.ivPosterPelicula.setImageURI(Uri.parse(pelicula.imagen))
+    } else {
+        holder.binding.ivPosterPelicula.setImageResource(R.drawable.no_foto)
+    }
+} catch (e: Exception) {
+    holder.binding.ivPosterPelicula.setImageResource(R.drawable.no_foto)
+}
+Cómo lo explico
+Las imágenes se guardan como URI en Room, no como imagen completa.
+Puede pasar que la URI falle o que no haya imagen.
+Por eso uso try/catch y una imagen por defecto para evitar que la app se cierre.
+17. Añadir botón “limpiar buscador”
+Qué añado
+
+Un botón para borrar el texto del buscador.
+
+Archivos que tocaría
+fragment_inicio.xml
+InicioFragment.kt
+XML
+<Button
+    android:id="@+id/btnLimpiarBusqueda"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Limpiar búsqueda" />
+Kotlin
+binding.btnLimpiarBusqueda.setOnClickListener {
+    binding.etBuscarInicio.text.clear()
+    mostrarPeliculas(listaPeliculasCompleta)
+}
+Cómo lo explico
+El botón limpia el EditText del buscador y vuelve a mostrar la lista completa de películas.
+18. Añadir contador de usuarios
+Qué añado
+
+Mostrar cuántos usuarios hay en la pantalla de usuarios.
+
+Archivos que tocaría
+fragment_usuarios.xml
+UsuariosFragment.kt
+Kotlin
+binding.tvContadorUsuarios.text = "Usuarios: ${lista.size}"
+Cómo lo explico
+Cada vez que muestro una lista de usuarios, actualizo el contador con el tamaño de la lista.
+19. Añadir validación de teléfono
+Qué añado
+
+Que el teléfono tenga 9 dígitos.
+
+Archivos que tocaría
+RegistroFragment.kt
+AnadirUsuarioFragment.kt
+EditarUsuarioFragment.kt
+Código
+if (telefono.length != 9 || !telefono.all { it.isDigit() }) {
+    Toast.makeText(
+        requireContext(),
+        "El teléfono debe tener 9 números",
+        Toast.LENGTH_SHORT
+    ).show()
+    return
+}
+Cómo lo explico
+Antes de guardar el usuario valido que el teléfono tenga 9 caracteres y que todos sean números.
+Si no cumple, muestro un Toast y corto la función con return.
+20. Añadir validación de contraseña
+Qué añado
+
+Que la contraseña tenga mínimo 4 caracteres.
+
+Archivos que tocaría
+RegistroFragment.kt
+AnadirUsuarioFragment.kt
+EditarUsuarioFragment.kt
+Código
+if (password.length < 4) {
+    Toast.makeText(
+        requireContext(),
+        "La contraseña debe tener al menos 4 caracteres",
+        Toast.LENGTH_SHORT
+    ).show()
+    return
+}
+Cómo lo explico
+Compruebo la longitud de la contraseña antes de guardar.
+Si es demasiado corta, aviso al usuario y no creo la cuenta.
+21. Añadir ocultar botón añadir película a usuario normal
+Qué añado
+
+Que solo el admin vea la pestaña de añadir película.
+
+Archivos que tocaría
+AppViewModel.kt
+MainActivity.kt
+AnadirPeliculaFragment.kt
+ViewModel
+fun puedeAñadirPelicula(): Boolean {
+    return usuario?.rol == "ADMIN"
+}
+MainActivity
+bottomNavigationView.menu.findItem(R.id.anadirPeliculaFragment)?.isVisible =
+    miViewModel.puedeAñadirPelicula()
+Fragment
+if (!(activity as MainActivity).miViewModel.puedeAñadirPelicula()) {
+    Toast.makeText(requireContext(), "No tienes permiso", Toast.LENGTH_SHORT).show()
+    findNavController().navigate(R.id.perfilFragment)
+    return
+}
+Cómo lo explico
+El menú inferior se adapta al rol del usuario.
+Si el usuario no es administrador, oculto la pestaña de añadir película.
+Además protejo el Fragment por seguridad.
+22. Añadir pregunta de confirmación al borrar película
+Qué añado
+
+Que al borrar salga una alerta antes.
+
+Archivos que tocaría
+DetallePeliculaFragment.kt
+Código
+AlertDialog.Builder(requireContext())
+    .setTitle("Eliminar película")
+    .setMessage("¿Seguro que quieres eliminar esta película?")
+    .setPositiveButton("Eliminar") { _, _ ->
+        (activity as MainActivity).miViewModel.borrarPelicula(pelicula)
+        findNavController().navigate(R.id.inicioFragment)
+    }
+    .setNegativeButton("Cancelar", null)
+    .show()
+Cómo lo explico
+Uso un AlertDialog para pedir confirmación antes de borrar.
+Así evito borrados accidentales.
+23. Añadir orden recomendado para hacer cualquier práctica
+
+Cuando te pidan añadir algo, sigue este orden:
+
+1. Pienso si afecta a datos, pantalla, lista, menú o navegación.
+2. Si afecta a datos, miro Entity y BBDD.
+3. Si necesita consulta, miro DAO.
+4. Si necesita lógica, miro ViewModel.
+5. Si se ve en pantalla, miro XML y Fragment.
+6. Si aparece en lista, miro Adapter y item XML.
+7. Si cambia de pantalla, miro nav_graph.
+8. Si es menú, miro menu_bottom/menu_main y MainActivity.
+9. Pruebo.
+24. Ideas rápidas para hacer en 5-10 minutos
+
+Estas son las más fáciles:
+
+Añadir Toast informativo.
+Añadir mensaje “No hay resultados”.
+Añadir contador de películas.
+Añadir validación de año.
+Añadir validación de contraseña.
+Añadir validación de teléfono.
+Añadir opción “Acerca de”.
+Eliminar FloatingActionButton.
+Cambiar color de botones.
+Cambiar texto de una pestaña.
+25. Ideas buenas para 20-30 minutos
+
+Estas son las mejores para practicar:
+
+Añadir favoritas.
+Añadir género.
+Añadir puntuación.
+Añadir filtro por género.
+Añadir ordenar por año.
+Añadir datos iniciales.
+Evitar duplicados.
+Ocultar añadir película a usuario normal.
+Proteger pantalla de usuarios.
+Añadir confirmación al cerrar sesión.
+26. Ideas más peligrosas
+
+Estas pueden salir, pero hay que practicarlas bien:
+
+Añadir una tabla nueva.
+Añadir relación entre tablas.
+Eliminar campos de Room.
+Cambiar muchos IDs XML.
+Cambiar mucho el nav_graph.
+Cambiar login y sesión.
+Añadir una pestaña nueva completa.
+
+¿Por qué son peligrosas?
+
+Porque si tocas Room, navegación o IDs XML y te equivocas, puede dejar de compilar.
+27. Frase final para defender cualquier añadido
+He añadido esta funcionalidad siguiendo la arquitectura de la app.
+El Fragment recoge los datos de la pantalla y llama al ViewModel.
+El ViewModel contiene la lógica y llama al repositorio.
+El repositorio llama al DAO.
+El DAO trabaja con Room.
+Si el cambio afecta a una lista, el Fragment observa LiveData y el RecyclerView se actualiza mediante el Adapter.
+28. La mejor práctica completa para entrenar
+
+La mejor práctica para entrenar en 30 minutos es:
+
+Añadir favoritas
+
+Porque toca muchas partes importantes:
+
+Pelicula.kt
+BBDD.kt
+DetallePeliculaFragment.kt
+fragment_detalle_pelicula.xml
+AdaptadorPelicula.kt
+InicioFragment.kt
+fragment_inicio.xml
+
+Y puedes defenderla diciendo:
+
+He añadido un campo favorita a la entidad Pelicula.
+Desde el detalle puedo cambiar ese valor.
+Uso copy para crear una película igual pero cambiando favorita.
+Actualizo la película en Room mediante el ViewModel.
+En el RecyclerView muestro una estrella si es favorita.
+Y en Inicio puedo filtrar la lista para ver solo las favoritas.
+
+Esa práctica demuestra que entiendes:
+
+Room
+Entity
+ViewModel
+Fragment
+RecyclerView
+Adapter
+Filtros
+Actualización de datos
+
+ */

@@ -127,7 +127,7 @@
             android:textStyle="bold"
             android:backgroundTint="#F50000" />
 
-       <!-- Boton de agregar a favoritos
+       <!-- Boton de agregar a favoritos ir a detalle de pelicula.kt
         <Button
     android:id="@+id/btnFavorita"
     android:layout_width="match_parent"

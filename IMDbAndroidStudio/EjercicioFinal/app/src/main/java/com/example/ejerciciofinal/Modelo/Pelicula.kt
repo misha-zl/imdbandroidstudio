@@ -17,5 +17,6 @@ data class Pelicula(
     /* se aáde esta columna para poder buscar por genero o tener favoritos */
     /*ve a fragment_anadir_pelicula.xml,fragment_editar_pelicula.xml,fragmen_item_pelicula.xml */
     /*var genero: String = ""
+    /*var favorito: Boolean = false ir a detalle de pelicula.xml*/
     var favorita: Boolean = false*/
 )

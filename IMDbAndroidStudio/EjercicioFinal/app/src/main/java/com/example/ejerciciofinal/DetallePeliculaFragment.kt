@@ -138,6 +138,8 @@ class DetallePeliculaFragment : Fragment() {
     }
 
 /*
+ir a Adaptador pelicula
+
     private fun cambiarFavorita() {
         val pelicula = peliculaActual ?: return
         val peliculaActualizada = pelicula.copy(favorita = !pelicula.favorita)

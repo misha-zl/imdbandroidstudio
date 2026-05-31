@@ -55,7 +55,7 @@ class AdaptadorPelicula(
         val pelicula = listaPeliculas[position]
 
         holder.binding.tvNombrePelicula.text = pelicula.nombre
-       /*
+       /* sirve para añadir al nombre la estrella si es favorita
        holder.binding.tvNombrePelicula.text =
             if (pelicula.favorita) {
                 "⭐ ${pelicula.nombre} "
